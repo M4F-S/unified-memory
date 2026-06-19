@@ -13,8 +13,8 @@
 git clone https://github.com/M4F-S/unified-memory.git
 cd unified-memory
 cp .env.example .env
-pip install -r requirements.txt
 npm install
+uv pip install -r requirements.txt
 ```
 
 ---
@@ -116,7 +116,7 @@ wrangler deploy
 
 ```bash
 # From repo root:
-python -c "from ingestion.synthesis import load_demo_memories; load_demo_memories('demo-user')"
+uv run python -c "from ingestion.synthesis import load_demo_memories; load_demo_memories('demo-user')"
 
 # You should see: "✅ Total synthesized: 30 memories for user demo-user"
 # This loads all synthetic demo data into Pinecone so the demo works instantly
@@ -131,7 +131,7 @@ python -c "from ingestion.synthesis import load_demo_memories; load_demo_memorie
 # DEMO_CONSENT_TOKEN=<token_id from Step 3>
 
 # Run the demo agent end-to-end:
-python demo/agent.py
+uv run python demo/agent.py
 
 # Expected output:
 # Scenario A: retrieves cross-platform activity memories ✅
@@ -167,7 +167,7 @@ npx vercel --prod
 # Create Google OAuth credentials:
 # console.cloud.google.com → New project → Enable Gmail API → Create OAuth credentials
 # Download credentials.json → place in repo root
-python -c "
+uv run python -c "
 from ingestion.connectors.gmail import GmailConnector
 g = GmailConnector()
 g.authenticate('credentials.json')
@@ -182,7 +182,7 @@ print(f'Imported {len(memories)} emails')
 ```bash
 # Go to github.com/settings/tokens → Generate token (read:user, repo)
 export GITHUB_TOKEN=ghp_your_token
-python -c "
+uv run python -c "
 from ingestion.connectors.github import GitHubConnector
 g = GitHubConnector()
 g.authenticate()
@@ -197,7 +197,7 @@ print(f'Imported {len(memories)} GitHub memories')
 ```bash
 # developer.spotify.com → Create app → get client_id + client_secret
 # Set in .env then:
-python -c "
+uv run python -c "
 from ingestion.connectors.spotify import SpotifyConnector
 s = SpotifyConnector()
 s.authenticate()
@@ -214,7 +214,7 @@ synthesize_batch(memories, 'real-user')
 - [ ] `NEAR ConsentNFT` deployed and callable on testnet
 - [ ] `MCP Worker` live at workers.dev URL — test: `curl https://YOUR-WORKER.workers.dev/.well-known/mcp`
 - [ ] `Pinecone index` has >30 memories loaded
-- [ ] `python demo/agent.py` runs all 4 scenarios without errors
+- [ ] `uv run python demo/agent.py` runs all 4 scenarios without errors
 - [ ] `Revocation scenario` blocks the agent and shows reason
 - [ ] `Frontend` live on Vercel with connect buttons working
 - [ ] `Demo consent token` minted and saved in .env
@@ -225,13 +225,7 @@ synthesize_batch(memories, 'real-user')
 
 Run the MCP server locally with FastAPI:
 ```bash
-pip install fastapi uvicorn
-python -c "
-from fastapi import FastAPI
-import uvicorn
-# Local MCP server — same logic as Cloudflare Worker
-uvicorn.run('workers.local_server:app', host='0.0.0.0', port=8000, reload=True)
-"
+uv run uvicorn workers.local_server:app --host 0.0.0.0 --port 8000 --reload
 # Set MCP_URL=http://localhost:8000 in .env
 ```
 This guarantees your demo runs even if Cloudflare deployment fails.

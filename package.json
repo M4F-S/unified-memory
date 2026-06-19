@@ -6,8 +6,11 @@
     "dev": "cd app && npm run dev",
     "deploy:workers": "cd workers && wrangler deploy",
     "deploy:contract": "cd contracts && near dev-deploy",
-    "demo": "python demo/agent.py",
-    "load-demo-data": "python -c \"from ingestion.synthesis import load_demo_memories; load_demo_memories()\""
+    "demo": "uv run python demo/agent.py",
+    "load-demo-data": "uv run python -c \"from ingestion.synthesis import load_demo_memories; load_demo_memories()\"",
+    "test": "npm run test:workers && uv run pytest tests/ -v",
+    "test:workers": "cd workers && npm test",
+    "test:python": "uv run pytest tests/ -v"
   },
   "workspaces": ["app", "contracts", "workers"],
   "dependencies": {

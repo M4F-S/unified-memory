@@ -102,7 +102,7 @@ Demo agent receives task: "What are the top 3 projects this user worked on this 
 
 ## If Something Breaks During Demo
 
-- MCP Worker down → fall back to local FastAPI server (same code, port 8000)
+- MCP Worker down → fall back to local FastAPI server: `uv run uvicorn workers.local_server:app --port 8000`
 - NEAR testnet slow → show pre-recorded transaction on NEAR Explorer
 - x402 payment fails → show Circle wallet balance change manually
 - Pinecone timeout → show cached response with "memory retrieved" message

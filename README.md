@@ -27,8 +27,10 @@ User → Consent NFT (NEAR) → MCP Server (Cloudflare Workers)
 
 ### Prerequisites
 ```
-node >= 18  |  python >= 3.11  |  wrangler CLI  |  near-cli
+node >= 18  |  python >= 3.11  |  uv  |  wrangler CLI  |  near-cli
 ```
+
+Install uv: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
 ### Install
 ```bash
@@ -36,7 +38,7 @@ git clone https://github.com/M4F-S/unified-memory.git
 cd unified-memory
 cp .env.example .env          # fill in your API keys
 npm install
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ### Deploy NEAR Contract
@@ -55,9 +57,19 @@ cd workers && wrangler deploy
 cd app && npm run dev
 ```
 
+### Run Local Fallback Server
+```bash
+uv run uvicorn workers.local_server:app --host 0.0.0.0 --port 8000
+```
+
+### Load Demo Memories
+```bash
+uv run python -c "from ingestion.synthesis import load_demo_memories; load_demo_memories('demo-user')"
+```
+
 ### Run Demo Agent
 ```bash
-cd demo && python agent.py
+uv run python demo/agent.py
 ```
 
 ---

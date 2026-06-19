@@ -111,6 +111,72 @@ MCP manifest at: `GET /.well-known/mcp`
 
 ---
 
+## COMPLETE API ROUTE REFERENCE
+
+> **Cloudflare Worker:** `https://unified-memory-mcp.YOUR-SUBDOMAIN.workers.dev`
+> **Local fallback:** `http://localhost:8000` (`uv run uvicorn workers.local_server:app --port 8000`)
+
+### MCP Memory Routes (`workers/mcp-server.js`)
+
+| Method | Path | Auth | Body |
+|--------|------|------|------|
+| `GET`  | `/.well-known/mcp` | none | — |
+| `POST` | `/mcp/recall_memory` | `X-PAYMENT` header + NEAR token | `{query, token_id, memory_type?, platform?}` |
+| `POST` | `/mcp/add_memory` | NEAR token | `{content, memory_type, source, token_id}` |
+| `POST` | `/mcp/get_memory_stats` | NEAR token | `{token_id}` |
+
+### Ingestion Routes (`workers/ingest.js`)
+
+| Method | Path | Body / Params |
+|--------|------|------|
+| `GET`  | `/ingest/connectors` | — → list of 20 connectors with `auth` type |
+| `POST` | `/ingest/trigger` | `{user_id, platform, token_id}` → `{job_id, status}` |
+| `POST` | `/ingest/trigger/batch` | `{user_id, platforms: string[], token_id}` → `{jobs: [{job_id, platform, status}]}` |
+| `GET`  | `/ingest/status/:job_id` | — → `{job_id, status, memories_processed}` |
+
+### Local Server Only
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Returns `{"status":"ok"}` |
+
+### Response shapes
+
+```jsonc
+// recall_memory → 200
+{ "jsonrpc": "2.0", "result": {
+    "memories": [{ "content": "", "summary": "", "source": "gmail", "type": "episodic", "timestamp": "", "score": 0.92 }],
+    "query_cost_usdc": 0.001, "remaining_queries": 19 }}
+
+// recall_memory → 403 (revoked / expired NFT)
+{ "jsonrpc": "2.0", "error": { "code": -32603, "message": "Access denied: Consent revoked" }}
+
+// recall_memory → 402 (missing payment)
+// Status 402 + header: PAYMENT-REQUIRED: {"scheme":"exact","network":"base-sepolia",...}
+
+// add_memory → 200
+{ "jsonrpc": "2.0", "result": { "memory_id": "agent-gmail-abc123", "type": "episodic", "importance_score": 7 }}
+
+// get_memory_stats → 200
+{ "jsonrpc": "2.0", "result": {
+    "nft_status": "active", "total_memories": 847,
+    "queries_used": 1, "queries_remaining": 19,
+    "usdc_spent": 0.001, "usdc_remaining": 0.499,
+    "expires_at": "2026-06-22T12:00:00.000Z" }}
+```
+
+### Error codes
+
+| HTTP | code | Meaning |
+|------|------|---------|
+| 400 | -32602 | Missing required field |
+| 402 | -32402 | x402 payment required |
+| 403 | -32603 | NFT invalid / revoked / expired |
+| 404 | -32604 | Token not found |
+| 503 | -32603 | NEAR RPC unreachable |
+
+---
+
 ## INGESTION CONNECTORS SPEC
 
 Each connector in `ingestion/connectors/*.py` must implement:

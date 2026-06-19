@@ -4,19 +4,20 @@ compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-NEAR_CONTRACT_ID = "consent-nft.testnet"
-NEAR_RPC = "https://rpc.testnet.near.org"
-PINECONE_INDEX_NAME = "unified-memory"
-PINECONE_ENV = "gcp-starter"
+NEAR_CONTRACT_ID      = "consent-nft.testnet"
+NEAR_RPC              = "https://rpc.testnet.near.org"
+PINECONE_INDEX_NAME   = "unified-memory"
+PINECONE_HOST         = "unified-memory-REPLACE.svc.gcp-starter.pinecone.io"
+EAS_SCHEMA_UID        = "0xYOUR_EAS_SCHEMA_UID"
 CIRCLE_WALLET_ADDRESS = "0xYOUR_CIRCLE_WALLET_ADDRESS"
+INGEST_BACKEND_URL    = ""
 
 [[kv_namespaces]]
 binding = "CONSENT_CACHE"
 id = "YOUR_KV_NAMESPACE_ID"
 
-[secrets]
-# Set with: wrangler secret put SECRET_NAME
-# PINECONE_API_KEY
-# OPENAI_API_KEY
-# CIRCLE_API_KEY
-# EAS_PRIVATE_KEY
+# Set secrets with: wrangler secret put SECRET_NAME
+# wrangler secret put OPENROUTER_API_KEY
+# wrangler secret put PINECONE_API_KEY
+# wrangler secret put CIRCLE_API_KEY
+# wrangler secret put EAS_PRIVATE_KEY

@@ -50,6 +50,59 @@ Mono: 0.875rem / JetBrains Mono
 
 ---
 
+## API ROUTES (copy-paste into your fetch calls)
+
+```ts
+// Set in next.config.js or .env.local:
+// NEXT_PUBLIC_MCP_URL=https://unified-memory-mcp.YOUR-SUBDOMAIN.workers.dev
+// (fallback: http://localhost:8000)
+
+const API = process.env.NEXT_PUBLIC_MCP_URL;
+
+// ── Memory ────────────────────────────────────────────────────────────────────
+GET  /.well-known/mcp                    // MCP manifest
+POST /mcp/recall_memory                  // query memory graph
+     body: { query, token_id, memory_type?, platform? }
+     → { result: { memories: [{content, summary, source, type, timestamp, score}], remaining_queries } }
+     → 403 if NFT revoked/expired | 402 if X-PAYMENT header missing
+
+POST /mcp/add_memory                     // write a new memory
+     body: { content, memory_type, source, token_id }
+     → { result: { memory_id, type, importance_score } }
+
+POST /mcp/get_memory_stats               // NFT status + usage
+     body: { token_id }
+     → { result: { nft_status, total_memories, queries_used, queries_remaining,
+                   usdc_spent, usdc_remaining, expires_at } }
+
+// ── Ingestion ─────────────────────────────────────────────────────────────────
+GET  /ingest/connectors                  // list all 20 connectors { platform, auth, label }
+POST /ingest/trigger                     // kick off single platform
+     body: { user_id, platform, token_id }
+     → { job_id, status: "queued", created_at }
+
+POST /ingest/trigger/batch               // kick off multiple platforms
+     body: { user_id, platforms: string[], token_id }
+     → { jobs: [{ job_id, platform, status }] }
+
+GET  /ingest/status/:job_id              // poll job status
+     → { job_id, status, memories_processed }
+
+// ── Local only ────────────────────────────────────────────────────────────────
+GET  /health                             // → { status: "ok" }
+```
+
+### Page → API mapping
+
+| Page | API calls needed |
+|------|-----------------|
+| `/onboard` | `GET /ingest/connectors`, `POST /ingest/trigger`, `GET /ingest/status/:id` |
+| `/consent` | `POST /mcp/get_memory_stats` (to list active NFTs) |
+| `/dashboard` | `POST /mcp/get_memory_stats` (polling), `GET /ingest/connectors` |
+| `/demo` | `POST /mcp/recall_memory`, `POST /mcp/get_memory_stats` |
+
+---
+
 ## PAGE DESIGNS
 
 ---
