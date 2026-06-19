@@ -1,0 +1,22 @@
+name = "unified-memory-mcp"
+main = "mcp-server.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NEAR_CONTRACT_ID = "consent-nft.testnet"
+NEAR_RPC = "https://rpc.testnet.near.org"
+PINECONE_INDEX_NAME = "unified-memory"
+PINECONE_ENV = "gcp-starter"
+CIRCLE_WALLET_ADDRESS = "0xYOUR_CIRCLE_WALLET_ADDRESS"
+
+[[kv_namespaces]]
+binding = "CONSENT_CACHE"
+id = "YOUR_KV_NAMESPACE_ID"
+
+[secrets]
+# Set with: wrangler secret put SECRET_NAME
+# PINECONE_API_KEY
+# OPENAI_API_KEY
+# CIRCLE_API_KEY
+# EAS_PRIVATE_KEY
