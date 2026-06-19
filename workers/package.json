@@ -1,0 +1,16 @@
+{
+  "name": "unified-memory-workers",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --reporter=verbose",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}
