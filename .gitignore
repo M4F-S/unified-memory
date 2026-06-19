@@ -1,0 +1,16 @@
+.env
+.env.local
+node_modules/
+__pycache__/
+*.pyc
+.next/
+dist/
+*.wasm
+conversations.json
+export.xml
+_chat.txt
+result.json
+watch-history.json
+*.zip
+credentials.json
+token.json
