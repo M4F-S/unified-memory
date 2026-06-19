@@ -38,7 +38,7 @@ git clone https://github.com/M4F-S/unified-memory.git
 cd unified-memory
 cp .env.example .env          # fill in your API keys
 npm install
-uv pip install -r requirements.txt
+uv sync                       # installs all Python deps from pyproject.toml
 ```
 
 ### Deploy NEAR Contract
