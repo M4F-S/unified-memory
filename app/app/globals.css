@@ -269,11 +269,21 @@ html, body {
   filter: blur(12px);
   transform: translateY(20px);
   transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease;
+  animation: autoReveal 1.2s ease forwards;
+  animation-delay: 0.5s;
+}
+@keyframes autoReveal {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
 }
 .blur-reveal.visible {
   opacity: 1;
   filter: blur(0);
   transform: none;
+  animation: none;
 }
 
 /* Node appear */

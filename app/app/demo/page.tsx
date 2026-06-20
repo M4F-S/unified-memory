@@ -42,7 +42,7 @@ export default function Demo() {
 
   // Check backend health on mount
   useEffect(() => {
-    fetch("http://187.124.2.26:8000/health", { method: "GET" })
+    fetch("/health", { method: "GET" })
       .then((r) => r.ok)
       .then((ok) => setBackendLive(ok))
       .catch(() => setBackendLive(false));
@@ -103,7 +103,7 @@ export default function Demo() {
     }
 
     // Try real API, fallback to mock
-    const apiResult = await recallMemory(query, tokenId);
+    const apiResult = await recallMemory(query, tokenId, "all", "all", true);
     const data = apiResult.ok && apiResult.data?.result ? apiResult.data : { result: { memories: [], query_cost_usdc: 0.001, remaining_queries: 3 } };
 
     setRuns((prev) =>

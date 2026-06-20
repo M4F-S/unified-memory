@@ -1,11 +1,11 @@
 // UnifiedMemory API Client — calls Cloudflare Worker MCP endpoints
 const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || "https://unified-memory-mcp.rapid-king-4a64.workers.dev";
-const DEMO_TOKEN = "0"; // Real NEAR testnet token ID for aihackathon.testnet
+const DEMO_TOKEN="***"; // Real NEAR testnet token ID for aihackathon.testnet
 
 async function post(path: string, body: object, opts?: { demo?: boolean }) {
   try {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (opts?.demo) headers["X-DEMO"] = "true";
+    if (opts?.demo) headers["X-PAYMENT"] = "demo";
     const r = await fetch(`${MCP_URL}${path}`, {
       method: "POST",
       headers,
@@ -38,7 +38,7 @@ export async function addMemory(content: string, memoryType: string, source: str
 }
 
 export async function getMemoryStats(tokenId: string) {
-  return post("/mcp/get_memory_stats", { token_id: tokenId });
+  return post("/mcp/get_memory_stats", { token_id: tokenId }, { demo: true });
 }
 
 export async function getMcpManifest() {
@@ -72,7 +72,7 @@ export async function mintConsent(body: {
 }
 
 export async function getConsentStatus(tokenId: string) {
-  return post("/mcp/get_memory_stats", { token_id: tokenId });
+  return post("/mcp/get_memory_stats", { token_id: tokenId }, { demo: true });
 }
 
 export { DEMO_TOKEN };
