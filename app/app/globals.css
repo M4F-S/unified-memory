@@ -320,6 +320,73 @@ html, body {
   animation: nftPulse 2s infinite;
 }
 
+/* Scroll bounce */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.animate-scroll-bounce {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* Nav slide */
+@keyframes navSlide {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-nav-slide {
+  animation: navSlide 0.8s ease both;
+}
+
+/* Logo pulse */
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(124,58,237,0); }
+}
+.animate-logo-pulse {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+/* SVG strands */
+.strand-path {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* Desktop-only strand animations */
+@media (min-width: 641px) {
+  .s1 { stroke: url(#g1); animation: sf1 8s ease-in-out infinite; }
+  .s2 { stroke: url(#g2); animation: sf2 11s ease-in-out infinite; animation-delay: -2s; }
+  .s3 { stroke: url(#g3); animation: sf3 9s ease-in-out infinite; animation-delay: -4s; }
+  .s4 { stroke: url(#g1); animation: sf1 13s ease-in-out infinite; animation-delay: -6s; }
+  .s5 { stroke: url(#g2); animation: sf2 10s ease-in-out infinite; animation-delay: -1s; }
+  .s6 { stroke: url(#g3); animation: sf3 15s ease-in-out infinite; animation-delay: -9s; }
+}
+
+/* Mobile: static strands (no d animation to prevent jank) */
+@media (max-width: 640px) {
+  .s1 { stroke: url(#g1); }
+  .s2 { stroke: url(#g2); }
+  .s3 { stroke: url(#g3); }
+  .s4 { stroke: url(#g1); }
+  .s5 { stroke: url(#g2); }
+  .s6 { stroke: url(#g3); }
+}
+
+@keyframes sf1 {
+  0%,100% { d: path("M-50,200 Q300,80 600,300 Q900,520 1300,250 Q1600,100 1900,350"); }
+  50% { d: path("M-50,280 Q300,160 650,200 Q950,240 1250,400 Q1550,560 1900,280"); }
+}
+@keyframes sf2 {
+  0%,100% { d: path("M-50,500 Q250,350 550,550 Q850,750 1150,480 Q1450,210 1900,600"); }
+  50% { d: path("M-50,400 Q300,520 580,380 Q860,240 1200,520 Q1540,800 1900,450"); }
+}
+@keyframes sf3 {
+  0%,100% { d: path("M-50,750 Q400,600 700,800 Q1000,1000 1300,700 Q1600,400 1900,800"); }
+  50% { d: path("M-50,680 Q350,800 700,650 Q1050,500 1350,750 Q1650,1000 1900,700"); }
+}
+
 /* Mobile typography */
 @media (max-width: 640px) {
   .hero-title-mobile {
@@ -332,6 +399,13 @@ html, body {
   .section-title-mobile {
     font-size: 2rem !important;
   }
+}
+
+/* No-JS fallback: blur-reveal elements visible when JS disabled */
+html.no-js .blur-reveal {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
 }
 
 /* Reduce motion for accessibility */

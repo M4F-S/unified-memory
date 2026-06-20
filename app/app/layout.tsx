@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="no-js" suppressHydrationWarning>
       <head>
-        <meta name="color-scheme" content="light dark" />
+        <meta name="color-scheme" content="dark" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 const stored = localStorage.getItem('um-theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const theme = stored || (prefersDark ? 'dark' : 'light');
+                const theme = stored || 'dark';
+                document.documentElement.classList.remove('light', 'dark', 'no-js');
                 document.documentElement.classList.add(theme);
               })();
             `,

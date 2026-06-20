@@ -47,6 +47,16 @@ export default function Home() {
     );
     document.querySelectorAll(".blur-reveal").forEach((el) => observerRef.current?.observe(el));
 
+    // Immediate reveal for above-the-fold elements (prevents FOIC)
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".blur-reveal").forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setTimeout(() => el.classList.add("visible"), i * 80);
+        }
+      });
+    });
+
     // Glow card mousemove
     const cards = document.querySelectorAll(".glow-card, .feature-card");
     const handler = (e: Event) => {
@@ -142,7 +152,7 @@ export default function Home() {
         />
       </div>
 
-      {/* SVG Strands - static decorative lines, no animation to prevent jank */}
+      {/* SVG Strands — 6 animated paths, desktop only */}
       <svg
         className="fixed inset-0 -z-[5] pointer-events-none"
         viewBox="0 0 1900 1000"
@@ -166,27 +176,12 @@ export default function Home() {
             <stop offset="100%" stopColor="#6ee7b7" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path
-          d="M-50,200 Q300,80 600,300 Q900,520 1300,250 Q1600,100 1900,350"
-          fill="none"
-          stroke="url(#g1)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M-50,500 Q250,350 550,550 Q850,750 1150,480 Q1450,210 1900,600"
-          fill="none"
-          stroke="url(#g2)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M-50,750 Q400,600 700,800 Q1000,1000 1300,700 Q1600,400 1900,800"
-          fill="none"
-          stroke="url(#g3)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
+        <path className="strand-path s1" d="M-50,200 Q300,80 600,300 Q900,520 1300,250 Q1600,100 1900,350" />
+        <path className="strand-path s2" d="M-50,500 Q250,350 550,550 Q850,750 1150,480 Q1450,210 1900,600" />
+        <path className="strand-path s3" d="M-50,750 Q400,600 700,800 Q1000,1000 1300,700 Q1600,400 1900,800" />
+        <path className="strand-path s4" d="M-50,120 Q400,300 700,150 Q1000,0 1300,200 Q1600,400 1900,150" />
+        <path className="strand-path s5" d="M-50,650 Q300,450 600,680 Q900,910 1200,620 Q1500,330 1900,700" />
+        <path className="strand-path s6" d="M-50,350 Q350,500 650,320 Q950,140 1250,400 Q1550,660 1900,420" />
       </svg>
 
       {/* Hero */}
@@ -242,7 +237,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="scroll-indicator animate-fade-up" style={{ animationDelay: "1.2s" }}>
+        <div className="scroll-indicator animate-fade-up animate-scroll-bounce" style={{ animationDelay: "1.2s" }}>
           <span style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>Scroll to explore</span>
           <div className="w-1 h-1 rounded-full mt-1.5" style={{ background: "var(--text-muted)" }} />
         </div>
