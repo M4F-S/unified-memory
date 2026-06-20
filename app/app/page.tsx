@@ -1,28 +1,35 @@
 "use client";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import {
+  BrainIcon, TrophyIcon, MailIcon, GitHubIcon, ChatGPTIcon, ClaudeIcon,
+  MusicIcon, ChatIcon, CameraIcon, TwitterIcon, BriefcaseIcon, DocumentIcon,
+  HashIcon, GamepadIcon, PlaneIcon, UsersIcon, PlayIcon, HeartIcon, FistIcon,
+  RunIcon, ClockIcon, BookIcon, GearIcon, HeartFilledIcon, LockIcon, LinkIcon,
+  BoltIcon, RobotIcon, DnaIcon, SatelliteIcon, CircleIcon, RedCircleIcon
+} from "@/components/Icons";
 
 const platforms = [
-  { icon: "\uD83D\uDCE7", name: "Gmail" },
-  { icon: "\uD83D\uDC19", name: "GitHub" },
-  { icon: "\uD83E\uDD16", name: "ChatGPT" },
-  { icon: "\uD83D\uDFE0", name: "Claude" },
-  { icon: "\uD83C\uDFB5", name: "Spotify" },
-  { icon: "\uD83D\uDCAC", name: "WhatsApp" },
-  { icon: "\uD83D\uDCF8", name: "Instagram" },
-  { icon: "\uD83D\uDC26", name: "Twitter/X" },
-  { icon: "\uD83D\uDCBC", name: "LinkedIn" },
-  { icon: "\uD83D\uDCD3", name: "Notion" },
-  { icon: "\uD83D\uDCBC", name: "Slack" },
-  { icon: "\uD83C\uDFAE", name: "Discord" },
-  { icon: "\u2708\uFE0F", name: "Telegram" },
-  { icon: "\uD83D\uDC65", name: "Facebook" },
-  { icon: "\uD83C\uDFB5", name: "TikTok" },
-  { icon: "\u25B6\uFE0F", name: "YouTube" },
-  { icon: "\u2764\uFE0F", name: "Apple Health" },
-  { icon: "\uD83E\uDD1A", name: "Reddit" },
-  { icon: "\uD83C\uDFC3", name: "Google Fit" },
-  { icon: "\u2709\uFE0F", name: "Apple Mail" },
+  { icon: <MailIcon size={14} />, name: "Gmail" },
+  { icon: <GitHubIcon size={14} />, name: "GitHub" },
+  { icon: <ChatGPTIcon size={14} />, name: "ChatGPT" },
+  { icon: <ClaudeIcon size={14} />, name: "Claude" },
+  { icon: <MusicIcon size={14} />, name: "Spotify" },
+  { icon: <ChatIcon size={14} />, name: "WhatsApp" },
+  { icon: <CameraIcon size={14} />, name: "Instagram" },
+  { icon: <TwitterIcon size={14} />, name: "Twitter/X" },
+  { icon: <BriefcaseIcon size={14} />, name: "LinkedIn" },
+  { icon: <DocumentIcon size={14} />, name: "Notion" },
+  { icon: <HashIcon size={14} />, name: "Slack" },
+  { icon: <GamepadIcon size={14} />, name: "Discord" },
+  { icon: <PlaneIcon size={14} />, name: "Telegram" },
+  { icon: <UsersIcon size={14} />, name: "Facebook" },
+  { icon: <MusicIcon size={14} />, name: "TikTok" },
+  { icon: <PlayIcon size={14} />, name: "YouTube" },
+  { icon: <HeartIcon size={14} />, name: "Apple Health" },
+  { icon: <FistIcon size={14} />, name: "Reddit" },
+  { icon: <RunIcon size={14} />, name: "Google Fit" },
+  { icon: <MailIcon size={14} />, name: "Apple Mail" },
 ];
 
 export default function Home() {
@@ -196,7 +203,7 @@ export default function Home() {
             animationDelay: "0.05s",
           }}
         >
-          \uD83C\uDFC6 AI Agents Berlin Hackathon 2026 \u00B7 42Berlin
+          <TrophyIcon size={14} className="inline-block align-text-bottom" /> AI Agents Berlin Hackathon 2026 \u00B7 42Berlin
         </div>
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-7 animate-fade-up"
@@ -248,13 +255,13 @@ export default function Home() {
           <div className="glass-card p-7">
             <div className="flex items-center justify-between mb-6">
               <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
-                \uD83E\uDDE0 Your Memory Graph
+                <BrainIcon size={16} className="inline-block align-text-bottom" /> Your Memory Graph
               </span>
               <span
                 className="text-xs font-semibold text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-400/20 animate-badge-pulse"
                 style={{ background: "rgba(16,185,129,0.1)" }}
               >
-                \u25CF Live Syncing
+                <CircleIcon size={8} className="inline-block align-text-bottom text-emerald-400" /> Live Syncing
               </span>
             </div>
             <div className="flex flex-wrap gap-2.5 mb-6">
@@ -376,17 +383,21 @@ export default function Home() {
             Every piece of data from every platform is classified into one of five scientifically-grounded memory types inspired by cognitive science.
           </p>
           <div className="flex flex-wrap gap-2.5 justify-center">
-            {[
-              { text: "\uD83D\uDD50 Episodic \u2014 What happened & when", cls: "bg-violet-500/10 text-violet-400 border-violet-500/20" },
-              { text: "\uD83D\uDCDA Semantic \u2014 Facts, skills, expertise", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-              { text: "\u2699\uFE0F Procedural \u2014 How you do things", cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-              { text: "\uD83D\uDC65 Social \u2014 Relationships & people", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
-              { text: "\uD83D\uDC9B Preferential \u2014 Tastes & values", cls: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-            ].map((p) => (
-              <span key={p.text} className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border ${p.cls}`}>
-                {p.text}
-              </span>
-            ))}
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border bg-violet-500/10 text-violet-400 border-violet-500/20">
+              <ClockIcon size={14} /> Episodic — What happened & when
+            </span>
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border bg-blue-500/10 text-blue-400 border-blue-500/20">
+              <BookIcon size={14} /> Semantic — Facts, skills, expertise
+            </span>
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+              <GearIcon size={14} /> Procedural — How you do things
+            </span>
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border bg-red-500/10 text-red-400 border-red-500/20">
+              <UsersIcon size={14} /> Social — Relationships & people
+            </span>
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border bg-orange-500/10 text-orange-400 border-orange-500/20">
+              <HeartFilledIcon size={14} /> Preferential — Tastes & values
+            </span>
           </div>
         </div>
       </section>
@@ -425,12 +436,12 @@ export default function Home() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "\uD83D\uDD10", title: "GDPR-Legal by Design", desc: "All data collected via official OAuth APIs or GDPR Article 20 Data Subject Access Requests. You have the legal right to your own data." },
-              { icon: "\uD83D\uDD17", title: "On-Chain Consent", desc: "Consent NFTs on NEAR blockchain give you cryptographic proof of what agents can access. Revocation is instant and permanent." },
-              { icon: "\u26A1", title: "x402 Micropayments", desc: "Agents pay 0.001 USDC per memory query via Circle's x402 protocol. The first AI memory system with native micropayment economics." },
-              { icon: "\uD83E\uDD16", title: "Agent-Agnostic MCP", desc: "One MCP endpoint works with ChatGPT, Claude, Gemini, or any custom agent. Your memory travels with you regardless of which AI you use." },
-              { icon: "\uD83E\uDDEC", title: "Merkle Provenance", desc: "Every memory is tamper-evident \u2014 traced to its source via a cryptographic Merkle-DAG. Agents know exactly where each memory came from." },
-              { icon: "\uD83D\uDCE1", title: "EAS Attestations", desc: "Every agent query is logged as an Ethereum Attestation Service record on Base Sepolia. Permanent, public proof of every memory access event." },
+              { icon: <LockIcon size={22} />, title: "GDPR-Legal by Design", desc: "All data collected via official OAuth APIs or GDPR Article 20 Data Subject Access Requests. You have the legal right to your own data." },
+              { icon: <LinkIcon size={22} />, title: "On-Chain Consent", desc: "Consent NFTs on NEAR blockchain give you cryptographic proof of what agents can access. Revocation is instant and permanent." },
+              { icon: <BoltIcon size={22} />, title: "x402 Micropayments", desc: "Agents pay 0.001 USDC per memory query via Circle's x402 protocol. The first AI memory system with native micropayment economics." },
+              { icon: <RobotIcon size={22} />, title: "Agent-Agnostic MCP", desc: "One MCP endpoint works with ChatGPT, Claude, Gemini, or any custom agent. Your memory travels with you regardless of which AI you use." },
+              { icon: <DnaIcon size={22} />, title: "Merkle Provenance", desc: "Every memory is tamper-evident \u2014 traced to its source via a cryptographic Merkle-DAG. Agents know exactly where each memory came from." },
+              { icon: <SatelliteIcon size={22} />, title: "EAS Attestations", desc: "Every agent query is logged as an Ethereum Attestation Service record on Base Sepolia. Permanent, public proof of every memory access event." },
             ].map((f) => (
               <div key={f.title} className="feature-card blur-reveal">
                 <div
@@ -491,11 +502,11 @@ export default function Home() {
               </div>
               <div className="flex justify-between">
                 <span style={{ color: "var(--text-muted)" }}>Status</span>
-                <span className="font-semibold text-emerald-400">\u25CF Active</span>
+                <span className="font-semibold text-emerald-400"><CircleIcon size={8} className="inline-block align-text-bottom text-emerald-400" /> Active</span>
               </div>
             </div>
             <Link href="/demo" className="btn-danger w-full text-center block mt-5">
-              \uD83D\uDD34 Revoke Consent (Burn NFT on NEAR)
+              <RedCircleIcon size={10} className="inline-block align-text-bottom text-red-500" /> Revoke Consent (Burn NFT on NEAR)
             </Link>
           </div>
         </div>
@@ -521,7 +532,7 @@ export default function Home() {
               border: "1px solid rgba(124,58,237,0.2)",
             }}
           >
-            \uD83C\uDFC6 Built at AI Agents Berlin Hackathon 2026
+            <TrophyIcon size={14} className="inline-block align-text-bottom" /> Built at AI Agents Berlin Hackathon 2026
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold mb-4">
             Give your agents
@@ -552,7 +563,7 @@ export default function Home() {
         className="px-6 md:px-12 py-9 border-t flex flex-col md:flex-row items-center justify-between gap-3"
         style={{ background: "var(--footer-bg)", backdropFilter: "blur(12px)", borderColor: "var(--border-nav)" }}
       >
-        <span className="font-bold text-lg gradient-text">\uD83E\uDDE0 UnifiedMemory</span>
+        <span className="font-bold text-lg gradient-text"><BrainIcon size={18} className="inline-block align-text-bottom" /> UnifiedMemory</span>
         <span className="text-xs" style={{ color: "var(--text-muted)" }}>
           AI Agents Berlin Hackathon 2026 \u00B7 Built at 42Berlin
         </span>

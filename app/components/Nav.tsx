@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { SunIcon, MoonIcon } from "@/components/Icons";
 
 const links = [
   { href: "/", label: "Home" },
@@ -77,7 +78,7 @@ export default function Nav() {
           title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+          {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
         </button>
         <Link href="/demo" className="btn-primary text-sm px-5 py-2.5">
           Live Demo
