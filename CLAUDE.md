@@ -18,14 +18,20 @@ UnifiedMemory is a consent-controlled AI agent memory platform built for the AI 
 - `workers/local_server.py` — FastAPI fallback, mirrors Worker exactly
 - `ingestion/synthesis.py` — classify + embed + upsert pipeline
 - `ingestion/connectors/*.py` — 20 connectors (Gmail, GitHub, Spotify, etc.)
+- `ingestion/connectors/__init__.py` — connector registry + lazy loader
+- `ingestion/run.py` — unified connector runner + CLI
 - `demo/agent.py` — demo agent with 4 scenarios + revocation
-- **126 tests passing**: 89 JS (Vitest) + 37 Python (pytest)
+- **175 tests passing**: 92 JS (Vitest) + 83 Python (pytest)
 
-### What is NOT done yet (critical for demo)
-1. NEAR ConsentNFT contract has NOT been deployed — no live contract address
-2. Pinecone index may be empty — demo data has NOT been loaded
-3. Connector Python deps missing from `pyproject.toml` (google-api-python-client, PyGithub, spotipy, etc.)
-4. Cloudflare Worker not deployed (needs `wrangler deploy` with real secrets)
+### Status (updated June 20) — all four original blockers DONE
+1. ✅ NEAR ConsentNFT deployed — `aihackathon.testnet`, demo token `0`
+2. ✅ Pinecone seeded — 30 demo memories in namespace `0`
+3. ✅ Connector deps installed — all 8 SDKs in `pyproject.toml` (`uv sync`)
+4. ✅ Cloudflare Worker deployed — `unified-memory-mcp.rapid-king-4a64.workers.dev`
+
+Connectors are now wired (registry + runner). Intentionally deferred (post-MVP):
+live ingestion endpoints (`POST /run`, `/ingest/*`) + frontend Connect wiring —
+the demo still runs on the seeded namespace `0`.
 
 ---
 
@@ -60,6 +66,10 @@ uv run uvicorn workers.local_server:app --host 0.0.0.0 --port 8000 --reload
 # Load demo data into Pinecone (needs OPENROUTER_API_KEY + PINECONE_API_KEY in .env)
 uv run python ingestion/synthesis.py
 
+# Run a single connector end-to-end (authenticate -> fetch -> synthesize -> Pinecone)
+uv run python -m ingestion.run github  --user 0                       # API connector (env creds)
+uv run python -m ingestion.run chatgpt --user 0 --file conversations.json  # export parser
+
 # Run demo agent (needs MCP_URL + DEMO_CONSENT_TOKEN in .env)
 uv run python demo/agent.py
 ```
@@ -77,6 +87,8 @@ uv run python demo/agent.py
 | `workers/ingest.js` | `/ingest/connectors`, `/ingest/trigger`, `/ingest/trigger/batch`, `/ingest/status/:job_id` |
 | `workers/local_server.py` | FastAPI mirror of Worker. Run as fallback if Cloudflare fails |
 | `ingestion/synthesis.py` | `synthesize_batch(memories, user_id)`, `load_demo_memories(user_id)` |
+| `ingestion/connectors/__init__.py` | Connector registry — `CONNECTORS`, `get_connector(platform)`, `list_connectors()` (lazy SDK imports) |
+| `ingestion/run.py` | `run_connector(platform, user_id, source_path=...)` + CLI (`python -m ingestion.run`) |
 | `workers/wrangler.toml` | Worker config — secrets listed, vars defined |
 | `pyproject.toml` | All Python deps; `uv sync` installs everything |
 
@@ -161,6 +173,10 @@ Live contract: `aihackathon.testnet`, demo token `0`.
 - Uses FastAPI `TestClient` (synchronous, despite async routes)
 - All external calls mocked with `unittest.mock.patch` + `AsyncMock`
 - `conftest.py` has shared fixtures: `client`, `mock_env`
+- `test_connectors.py` — registry/runner: parametrized interface conformance over all 20
+  connectors, real export-parser fixtures (chatgpt/whatsapp via `tmp_path`), one mocked API
+  connector (github), runner wiring. No network.
+- `test_project_conditions.py` — connector SDKs importable, `RawMemory` contract, pyproject deps.
 
 ---
 
