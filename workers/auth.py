@@ -98,6 +98,15 @@ def _public(user: dict) -> dict:
     return {"id": user["id"], "email": user["email"]}
 
 
+def current_user(authorization: str | None = Header(default=None)) -> dict:
+    """FastAPI dependency: resolve the bearer token to {id, email}. 401 if invalid.
+
+    Reusable by other routers (e.g. ingestion) that need the logged-in user.
+    """
+    payload = _decode_token(authorization)
+    return {"id": payload.get("sub"), "email": payload.get("email")}
+
+
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
 @router.post("/register")
