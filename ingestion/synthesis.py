@@ -110,7 +110,7 @@ def synthesize_batch(memories: List[RawMemory], user_id: str, batch_size: int = 
         except Exception as e:
             print(f"  ⚠️  {raw.source}: {e}")
     if vectors:
-        index.upsert(vectors=vectors, namespace=user_id)
+        _get_index().upsert(vectors=vectors, namespace=user_id)
         total += len(vectors)
     print(f"  ✅ Done: {total} memories for {user_id}")
     return total
