@@ -131,7 +131,19 @@ This project uses `uv`, not `pip`. Always:
 - `uv run python ...` — run scripts
 - Never use `pip install` or write `pip` in any docs.
 
-### 5. pyproject.toml is the source of truth
+### 5. NEAR testnet RPC is dead — use FastNEAR
+`rpc.testnet.near.org` is deprecated and returns `-429`. Use `https://rpc.testnet.fastnear.com`.
+- App code: `NEAR_RPC` in `.env` (already set correctly)
+- **Classic near-cli (v4.x)** reads `NEAR_TESTNET_RPC` — NOT `NEAR_CLI_TESTNET_RPC_SERVER_URL`. Export it before any `near` command: `export NEAR_TESTNET_RPC=https://rpc.testnet.fastnear.com`
+
+### 6. NEAR contract WASM needs wasi-stub
+If compiling `contracts/consent_nft.js` manually, the `near-sdk-js` pipeline's final
+step (`wasi-stub`) is mandatory — NEAR's VM has no WASI. Skipping it causes
+`CompilationError: PrepareError: Instantiate` on deploy. Source of truth is
+`contracts/consent_nft_src.js` (clean ESM); build via `npm run build` in `contracts/`.
+Live contract: `aihackathon.testnet`, demo token `0`.
+
+### 7. pyproject.toml is the source of truth
 `requirements.txt` still exists (legacy) but `pyproject.toml` is authoritative. `uv sync` reads `pyproject.toml`. If adding deps, use `uv add <package>` — it updates both pyproject.toml and uv.lock.
 
 ---

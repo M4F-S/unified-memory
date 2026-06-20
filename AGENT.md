@@ -2,12 +2,54 @@
 
 ## Status: Hackathon Day 2 — June 20, 2026
 
-Everything is built and tested. The critical gap: **nothing is live yet.**
-No deployed contract, no Pinecone data, no Worker URL. Demo will fail if these aren't done.
+The critical gap: **getting things live.**
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | NEAR ConsentNFT contract deployed + token minted | ✅ DONE |
+| 2 | Load demo data into Pinecone | ⬜ TODO (needs API keys) |
+| 3 | Connector deps in pyproject.toml | ✅ DONE |
+| 4 | End-to-end demo test | ⬜ TODO |
+| 5 | Deploy Cloudflare Worker | ⬜ TODO |
+
+### Live deployment values (in .env)
+```
+NEAR_CONTRACT_ID=aihackathon.testnet
+DEMO_CONSENT_TOKEN=0
+NEAR_RPC=https://rpc.testnet.fastnear.com
+```
+Contract owner/signer: `aihackathon.testnet`. Verified: `validate_query` returns `{valid:true, remaining_queries:100}`.
 
 ---
 
-## Priority 1 — NEAR ConsentNFT Contract (BLOCKING)
+## Priority 1 — NEAR ConsentNFT Contract ✅ DONE
+
+> Deployed to `aihackathon.testnet`, token `0` minted, validated on-chain.
+> Re-run instructions below only if redeploying from scratch.
+
+### Two gotchas that cost us time (READ BEFORE REDEPLOYING)
+
+1. **The deprecated RPC server.** `rpc.testnet.near.org` is dead and returns
+   `-429 THIS ENDPOINT IS DEPRECATED`. The classic `near-cli` (v4.0.13) reads the
+   override from the env var **`NEAR_TESTNET_RPC`** (NOT `NEAR_CLI_TESTNET_RPC_SERVER_URL`).
+   Always start your terminal session with:
+   ```bash
+   export NEAR_TESTNET_RPC=https://rpc.testnet.fastnear.com
+   ```
+   This must stay set for login, deploy, call, AND view.
+
+2. **wasi-stub is mandatory.** If you compile the WASM manually (bypassing
+   `near-sdk-js build`), you MUST run the wasi-stub step afterward or deploy fails
+   with `CompilationError: PrepareError: Instantiate`. NEAR's VM has no WASI:
+   ```bash
+   bash node_modules/near-sdk-js/lib/cli/deps/binaryen/wasi-stub/run.sh contracts/consent_nft.wasm
+   ```
+
+3. **near-cli v4 uses positional args + `--force`** to redeploy over existing code:
+   ```bash
+   near deploy aihackathon.testnet contracts/consent_nft.wasm \
+     --initFunction init --initArgs '{"owner_id":"aihackathon.testnet"}' --force
+   ```
 
 Without a live contract, every MCP call returns 503 (NEAR RPC error). This blocks everything.
 
