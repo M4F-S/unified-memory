@@ -23,6 +23,30 @@ User → Consent NFT (NEAR) → MCP Server (Cloudflare Workers)
                   (Gmail, GitHub, Twitter, ChatGPT, Spotify...)
 ```
 
+## ✅ Live Status (June 20, 2026)
+
+The backend is **live and verified end-to-end** against real NEAR + Pinecone + OpenRouter.
+
+| Component | Status | Detail |
+|---|---|---|
+| NEAR ConsentNFT | 🟢 deployed | `aihackathon.testnet`, demo token `0` |
+| Memory store | 🟢 seeded | Pinecone `unified-memory` (1536-d cosine), 30 demo memories in namespace `0` |
+| MCP API | 🟢 verified | `recall_memory` / `add_memory` / `get_memory_stats` working |
+| x402 gate | 🟢 verified | 402 without `X-PAYMENT`, passes with it |
+| Consent gate | 🟢 verified | invalid/revoked token → `403 Access denied` |
+| Cloudflare Worker | 🟢 deployed | `unified-memory-mcp.rapid-king-4a64.workers.dev` (FastAPI fallback still available) |
+| Consent REST API | 🟢 verified | `POST /api/mint`, `POST /api/revoke/:id`, `GET /api/consent/:id` on FastAPI host — real on-chain mint→read→revoke (token `0` protected) |
+| Revocation demo | 🟢 live | real on-chain `revoke_consent` → tx hash → Scenario D blocked |
+
+End-to-end check (local FastAPI vs. live services): no-payment → `402`, with payment →
+5 memories returned + `remaining_queries` decrements, invalid token → `403`.
+
+> **Note for the team:** NEAR testnet RPC `rpc.testnet.near.org` is dead. Use
+> `https://rpc.testnet.fastnear.com`. For the classic near-cli, export it as
+> `NEAR_TESTNET_RPC`. See `AGENT.md` for the full backend runbook.
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -117,8 +141,10 @@ unified-memory/
 │   └── agent.py            Live hackathon demo agent
 ├── AGENT_BRIEF.md          Complete spec for AI agent builders
 ├── TEAM_BRIEF.md           Simple brief for human teammates
+├── CLAUDE.md               Project guide for AI assistants (gotchas, conventions)
+├── AGENT.md                Backend action plan + live deployment runbook
 ├── .env.example            All required API keys
-└── requirements.txt        Python dependencies
+└── pyproject.toml          Python dependencies (uv sync)
 ```
 
 ---

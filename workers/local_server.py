@@ -2,14 +2,34 @@
 # FastAPI fallback — same API as the Cloudflare Worker
 # Run: uvicorn workers.local_server:app --host 0.0.0.0 --port 8000
 
-import os, base64, hashlib, json
+import os, sys, base64, hashlib, json
+from datetime import datetime
+from pathlib import Path
 from fastapi import FastAPI, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Consent-management (mint/revoke) needs to SIGN NEAR transactions, which the
+# proven near-cli wrapper in demo/near_consent.py already does. Import it here so
+# the FastAPI host can expose /api/mint and /api/revoke. Guarded so a missing
+# near-cli / import never breaks the read-only MCP surface or the test suite.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+try:
+    from demo.near_consent import mint_consent, revoke_consent as near_revoke, NearError
+    _SIGNING_OK, _SIGNING_ERR = True, ""
+except Exception as _imp_err:  # pragma: no cover - only on hosts without near-cli deps
+    _SIGNING_OK, _SIGNING_ERR = False, str(_imp_err)
+
+# token_id "0" is the shared, seeded baseline the API tests + demo recall rely on.
+# revoke_consent is irreversible, so the API must never burn it.
+PROTECTED_TOKENS = {"0"}
 
 app = FastAPI(title="UnifiedMemory MCP Server (local fallback)")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -82,12 +102,12 @@ async def classify_memory(content: str, source: str) -> dict:
 
 # ── Pinecone helpers ───────────────────────────────────────────────────────────
 
-async def pinecone_query(embedding: list, filter: dict, top_k: int = 5) -> list:
+async def pinecone_query(embedding: list, filter: dict, top_k: int = 5, namespace: str = "") -> list:
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(
             f"https://{PINECONE_HOST}/query",
             headers=PINECONE_HEADERS,
-            json={"vector": embedding, "filter": filter, "topK": top_k, "includeMetadata": True}
+            json={"vector": embedding, "filter": filter, "topK": top_k, "namespace": namespace, "includeMetadata": True}
         )
     return resp.json().get("matches", [])
 
@@ -202,7 +222,7 @@ async def recall_memory(request: Request):
     if memory_type != "all": filter_["memory_type"] = {"$eq": memory_type}
     if platform    != "all": filter_["platform"]     = {"$eq": platform}
 
-    matches = await pinecone_query(embedding, filter_)
+    matches = await pinecone_query(embedding, filter_, namespace=token_id)
 
     return {
         "jsonrpc": "2.0",
@@ -308,8 +328,82 @@ async def get_memory_stats(request: Request):
     }
 
 
+# ── Consent management (signing endpoints) ─────────────────────────────────────
+# These mint/revoke real Consent NFTs on NEAR, so they need near-cli + the signer
+# key and only run on the FastAPI host (the Cloudflare Worker can't sign on-chain).
+# The frontend consent/onboard/dashboard pages call these.
+
+@app.post("/api/mint")
+async def api_mint(request: Request):
+    """Mint a Consent NFT. Body (all optional, fall back to full demo scope):
+    {agent_id, platforms[], types[], max_queries, max_usdc, expires_days}.
+    Returns {token_id, tx_hash, explorer_url}."""
+    if not _SIGNING_OK:
+        return JSONResponse(status_code=503, content={"error": f"on-chain signing unavailable: {_SIGNING_ERR}"})
+    body = await request.json()
+    try:
+        result = await run_in_threadpool(
+            mint_consent,
+            agent_id=body.get("agent_id"),
+            allowed_platforms=body.get("platforms"),
+            allowed_memory_types=body.get("types"),
+            max_queries=body.get("max_queries"),
+            max_usdc_budget=body.get("max_usdc"),
+            expires_days=body.get("expires_days"),
+        )
+    except NearError as e:
+        return JSONResponse(status_code=502, content={"error": f"NEAR mint failed: {str(e).splitlines()[0][:200]}"})
+    return result
+
+
+@app.post("/api/revoke/{token_id}")
+async def api_revoke(token_id: str):
+    """Revoke a Consent NFT on-chain. Returns {status, token_id, tx_hash, explorer_url}.
+    Refuses the protected baseline token (revocation is irreversible)."""
+    if not _SIGNING_OK:
+        return JSONResponse(status_code=503, content={"error": f"on-chain signing unavailable: {_SIGNING_ERR}"})
+    if token_id in PROTECTED_TOKENS:
+        return JSONResponse(status_code=409, content={
+            "error": f"Token {token_id} is the protected demo baseline and cannot be revoked via API. "
+                     f"Mint a fresh token (POST /api/mint) to demonstrate revocation."})
+    try:
+        tx, url = await run_in_threadpool(near_revoke, token_id)
+    except NearError as e:
+        return JSONResponse(status_code=502, content={"error": f"NEAR revoke failed: {str(e).splitlines()[0][:200]}"})
+    return {"status": "revoked", "token_id": token_id, "tx_hash": tx, "explorer_url": url}
+
+
+@app.get("/api/consent/{token_id}")
+async def api_consent(token_id: str):
+    """Read on-chain consent metadata (view call — no signing). Returns
+    {token_id, status, agent_id, owner, platforms, types, usage, expires_at}."""
+    try:
+        consent = await near_view("get_consent", {"token_id": token_id})
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"error": f"NEAR error: {e}"})
+    if not consent:
+        return JSONResponse(status_code=404, content={"error": "Token not found"})
+    status = "active" if consent["is_active"] else ("revoked" if consent.get("revoked_at") else "expired")
+    expires_at = None
+    if consent.get("expires_at"):
+        expires_at = datetime.utcfromtimestamp(int(consent["expires_at"]) / 1000).isoformat()
+    return {
+        "token_id":        token_id,
+        "status":          status,
+        "agent_id":        consent.get("agent_id"),
+        "owner":           consent.get("owner"),
+        "platforms":       consent.get("allowed_platforms", []),
+        "types":           consent.get("allowed_memory_types", []),
+        "max_queries":     consent.get("max_queries"),
+        "queries_used":    consent.get("queries_used"),
+        "max_usdc_budget": consent.get("max_usdc_budget"),
+        "usdc_spent":      consent.get("usdc_spent"),
+        "expires_at":      expires_at,
+    }
+
+
 # ── Health check ───────────────────────────────────────────────────────────────
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "UnifiedMemory local MCP server"}
+    return {"status": "ok", "service": "UnifiedMemory local MCP server", "signing": _SIGNING_OK}

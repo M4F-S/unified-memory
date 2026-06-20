@@ -19,7 +19,9 @@ class TestHealth:
     def test_returns_ok(self, client):
         r = client.get("/health")
         assert r.status_code == 200
-        assert r.json() == {"status": "ok", "service": "UnifiedMemory local MCP server"}
+        body = r.json()
+        assert body["status"] == "ok"
+        assert body["service"] == "UnifiedMemory local MCP server"
 
 
 # ── GET /.well-known/mcp ──────────────────────────────────────────────────────
@@ -377,3 +379,69 @@ class TestGetMemoryStats:
             mock.return_value = consent
             r = client.post(self.BASE, json={"token_id": "tok_1"})
         assert abs(r.json()["result"]["usdc_remaining"] - 0.75) < 1e-9
+
+
+# ── GET /api/consent/{token_id} ───────────────────────────────────────────────
+
+class TestApiConsent:
+    def test_active_consent(self, client):
+        with patch(f"{PATCH}.near_view", new_callable=AsyncMock) as mock:
+            mock.return_value = {**MOCK_CONSENT, "agent_id": "demo-agent.testnet",
+                                 "allowed_platforms": ["gmail"], "allowed_memory_types": ["episodic"]}
+            r = client.get("/api/consent/0")
+        assert r.status_code == 200
+        body = r.json()
+        assert body["status"] == "active"
+        assert body["owner"] == "alice.testnet"
+        assert body["platforms"] == ["gmail"]
+
+    def test_revoked_consent_status(self, client):
+        with patch(f"{PATCH}.near_view", new_callable=AsyncMock) as mock:
+            mock.return_value = {**MOCK_CONSENT, "is_active": False, "revoked_at": "123456"}
+            r = client.get("/api/consent/5")
+        assert r.json()["status"] == "revoked"
+
+    def test_token_not_found_returns_404(self, client):
+        with patch(f"{PATCH}.near_view", new_callable=AsyncMock) as mock:
+            mock.return_value = None
+            r = client.get("/api/consent/999")
+        assert r.status_code == 404
+
+
+# ── POST /api/mint ────────────────────────────────────────────────────────────
+
+class TestApiMint:
+    def test_mint_returns_token_and_tx(self, client):
+        with patch(f"{PATCH}.mint_consent") as mock:
+            mock.return_value = {"token_id": "9", "tx_hash": "TX9", "explorer_url": "https://x/TX9"}
+            r = client.post("/api/mint", json={"agent_id": "a.testnet", "max_queries": 5})
+        assert r.status_code == 200
+        assert r.json()["token_id"] == "9"
+        assert r.json()["tx_hash"] == "TX9"
+
+    def test_mint_signing_unavailable_returns_503(self, client):
+        with patch(f"{PATCH}._SIGNING_OK", False):
+            r = client.post("/api/mint", json={})
+        assert r.status_code == 503
+
+
+# ── POST /api/revoke/{token_id} ───────────────────────────────────────────────
+
+class TestApiRevoke:
+    def test_revoke_returns_tx(self, client):
+        with patch(f"{PATCH}.near_revoke") as mock:
+            mock.return_value = ("TXREV", "https://x/TXREV")
+            r = client.post("/api/revoke/7")
+        assert r.status_code == 200
+        assert r.json()["status"] == "revoked"
+        assert r.json()["tx_hash"] == "TXREV"
+
+    def test_protected_baseline_token_blocked(self, client):
+        r = client.post("/api/revoke/0")
+        assert r.status_code == 409
+        assert "protected" in r.json()["error"].lower()
+
+    def test_revoke_signing_unavailable_returns_503(self, client):
+        with patch(f"{PATCH}._SIGNING_OK", False):
+            r = client.post("/api/revoke/7")
+        assert r.status_code == 503
