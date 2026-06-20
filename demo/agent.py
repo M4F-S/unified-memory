@@ -18,7 +18,7 @@ client = OpenAI(
     }
 )
 
-AGENT_MODEL   = os.getenv("OPENROUTER_SMART_MODEL", "kimi/kimi-k2.5")
+AGENT_MODEL   = os.getenv("OPENROUTER_SMART_MODEL", "moonshotai/kimi-k2")
 MCP_URL       = os.getenv("MCP_URL", "https://mcp.unified-memory.workers.dev")
 CONSENT_TOKEN = os.getenv("DEMO_CONSENT_TOKEN", "demo-token-001")
 
@@ -52,6 +52,15 @@ def recall_memory(query, memory_type="all", platform="all"):
     return r
 
 
+def parse_tool_args(raw):
+    if isinstance(raw, dict):
+        return raw
+    args = json.loads(raw)
+    if isinstance(args, str):
+        args = json.loads(args)
+    return args if isinstance(args, dict) else {}
+
+
 def run_agent(task, label):
     print(f"\n{'='*65}\n🎯 {label}\n📋 {task}\n{'='*65}")
     messages = [
@@ -64,7 +73,8 @@ def run_agent(task, label):
         if msg.tool_calls:
             messages.append(msg)
             for tc in msg.tool_calls:
-                result = recall_memory(**json.loads(tc.function.arguments))
+                args = parse_tool_args(tc.function.arguments)
+                result = recall_memory(**{k: args[k] for k in ("query", "memory_type", "platform") if k in args})
                 messages.append({"role":"tool","tool_call_id":tc.id,"content":json.dumps(result)})
         else:
             print(f"\n🤖 {msg.content}")
