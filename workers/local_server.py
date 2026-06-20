@@ -2,10 +2,10 @@
 # FastAPI fallback — same API as the Cloudflare Worker
 # Run: uvicorn workers.local_server:app --host 0.0.0.0 --port 8000
 
-import os, sys, base64, hashlib, json
+import os, sys, base64, hashlib, json, tempfile
 from datetime import datetime
 from pathlib import Path
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File, Form, Depends, Header, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -37,11 +37,25 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 # Email/password auth (bcrypt + JWT) for the demo frontend. Guarded so a missing
 # auth dep never takes down the MCP surface or the existing test suite.
 try:
-    from workers.auth import router as auth_router
+    from workers.auth import router as auth_router, current_user
     app.include_router(auth_router)
     _AUTH_OK = True
 except Exception as _auth_err:  # pragma: no cover - only on hosts without auth deps
     _AUTH_OK = False
+
+    def current_user(authorization: str | None = Header(default=None)):
+        raise HTTPException(status_code=503, detail="Auth unavailable")
+
+# Connector ingestion pipeline (file-upload parsers). Guarded so a host missing
+# the heavy ingestion deps (pinecone/openai) still serves the rest of the API.
+try:
+    from ingestion.run import run_connector
+    _INGEST_OK = True
+except Exception as _ingest_err:  # pragma: no cover - only on hosts without ingest deps
+    _INGEST_OK = False
+
+# JSON export parsers that work from a single uploaded file (no OAuth / API keys).
+UPLOAD_CONNECTORS = {"chatgpt", "claude", "telegram"}
 
 NEAR_RPC         = os.getenv("NEAR_RPC", "https://rpc.testnet.near.org")
 NEAR_CONTRACT_ID = os.getenv("NEAR_CONTRACT_ID", "consent-nft.testnet")
@@ -411,8 +425,58 @@ async def api_consent(token_id: str):
     }
 
 
+# ── Ingestion (file-upload connectors) ─────────────────────────────────────────
+
+@app.get("/ingest/upload/connectors")
+def ingest_upload_connectors():
+    """List the upload-based connectors the frontend can offer (no auth)."""
+    labels = {"chatgpt": "ChatGPT", "claude": "Claude", "telegram": "Telegram"}
+    return {"connectors": [
+        {"platform": p, "label": labels.get(p, p.title()), "auth": "upload", "accept": ".json"}
+        for p in sorted(UPLOAD_CONNECTORS)
+    ]}
+
+
+@app.post("/ingest/upload")
+async def ingest_upload(
+    platform: str = Form(...),
+    file: UploadFile = File(...),
+    user: dict = Depends(current_user),
+):
+    """Ingest an uploaded export file into the logged-in user's vault.
+
+    namespace = user id (per-user Pinecone namespace). Parses the file with the
+    platform connector, then classifies + embeds + upserts via synthesize_batch.
+    """
+    if not _INGEST_OK:
+        return JSONResponse(status_code=503, content={"error": "Ingestion backend unavailable"})
+    if platform not in UPLOAD_CONNECTORS:
+        return JSONResponse(status_code=400, content={
+            "error": f"Upload not supported for '{platform}'. Supported: {sorted(UPLOAD_CONNECTORS)}"})
+
+    namespace = user["id"]
+    suffix = Path(file.filename or "upload.json").suffix or ".json"
+    tmp_path = None
+    try:
+        contents = await file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as fh:
+            fh.write(contents)
+            tmp_path = fh.name
+        count = await run_in_threadpool(run_connector, platform, namespace, source_path=tmp_path)
+    except json.JSONDecodeError:
+        return JSONResponse(status_code=422, content={"error": "Uploaded file is not valid JSON"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"{type(e).__name__}: {e}"})
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+    return {"platform": platform, "ingested": count, "namespace": namespace}
+
+
 # ── Health check ───────────────────────────────────────────────────────────────
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "UnifiedMemory local MCP server", "signing": _SIGNING_OK}
+    return {"status": "ok", "service": "UnifiedMemory local MCP server",
+            "signing": _SIGNING_OK, "ingest": _INGEST_OK}

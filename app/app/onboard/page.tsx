@@ -1,6 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { CONNECTORS } from "@/lib/api";
+import UploadConnector from "@/components/UploadConnector";
+
+// Connectors wired end-to-end (upload → parse → synthesize → vault).
+const LIVE_CONNECTORS = new Set(["chatgpt", "claude", "telegram"]);
 
 export default function Onboard() {
   const totalMemories = CONNECTORS.reduce((sum, c) => sum + c.memories, 0);
@@ -43,21 +47,29 @@ export default function Onboard() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-bold text-um-text">{c.label}</span>
-                  {c.connected ? (
+                  {LIVE_CONNECTORS.has(c.platform) ? (
+                    <span className="text-[10px] font-bold text-[#7c3aed] px-2 py-0.5 rounded-full border border-[#7c3aed]/30 bg-[#7c3aed]/10">LIVE</span>
+                  ) : c.connected ? (
                     <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-400/20 bg-emerald-400/10">CONNECTED</span>
                   ) : (
                     <span className="text-[10px] font-bold text-um-muted px-2 py-0.5 rounded-full border border-um-border">{c.auth}</span>
                   )}
                 </div>
-                <div className="text-xs text-um-muted">{c.memories.toLocaleString()} memories</div>
+                <div className="text-xs text-um-muted">
+                  {LIVE_CONNECTORS.has(c.platform) ? "Upload your export to import" : `${c.memories.toLocaleString()} memories`}
+                </div>
               </div>
-              <button className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${
-                c.connected
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  : "bg-um-primary/10 text-um-primary border border-um-primary/20 hover:bg-um-primary/20"
-              }`}>
-                {c.connected ? "Manage" : "Connect"}
-              </button>
+              {LIVE_CONNECTORS.has(c.platform) ? (
+                <UploadConnector platform={c.platform} />
+              ) : (
+                <button className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${
+                  c.connected
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-um-primary/10 text-um-primary border border-um-primary/20 hover:bg-um-primary/20"
+                }`}>
+                  {c.connected ? "Manage" : "Connect"}
+                </button>
+              )}
             </div>
           ))}
         </div>
