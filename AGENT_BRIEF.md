@@ -21,8 +21,8 @@ Build a production-grade platform called UnifiedMemory that:
 |---|---|
 | Smart Contract | NEAR JS SDK (consent_nft contract on testnet) |
 | Edge Runtime | Cloudflare Workers + Hono + Durable Objects |
-| Vector DB | Pinecone (text-embedding-3-small, 1536 dims) |
-| LLM | OpenAI GPT-4o (synthesis) + GPT-4o-mini (classification) |
+| Vector DB | Pinecone (text-embedding-3-small, 1536 dims) — **live**, index `unified-memory` |
+| LLM | OpenRouter — DeepSeek V3.2 (classification), text-embedding-3-small passthrough (embeddings), Kimi K2.5 (agent reasoning) |
 | Payments | Circle Programmable Wallets + x402 protocol |
 | Attestations | EAS (Ethereum Attestation Service) on Base Sepolia |
 | Frontend | Next.js 14 App Router + Tailwind + NEAR Wallet Selector |
@@ -33,6 +33,7 @@ Build a production-grade platform called UnifiedMemory that:
 ## FILE EXECUTION ORDER
 
 Build files in this exact order — each depends on the previous:
+(Steps 1–2 and 7 are ✅ done; contract is live at `aihackathon.testnet`, Pinecone seeded.)
 
 1. `.env.example` → fill with real keys → save as `.env`
 2. `contracts/consent_nft.js` → deploy to NEAR testnet

@@ -7,6 +7,30 @@
 
 ---
 
+## ✅ Already Done (as of June 20, 2026)
+
+The backend is live. If you just want to run the demo, you can skip to Step 6.
+
+- ✅ **STEP 3 — NEAR ConsentNFT deployed** to `aihackathon.testnet`, demo token `0` minted
+- ✅ **STEP 5 — Demo memories loaded** (30 vectors in Pinecone `unified-memory`, namespace `0`)
+- ✅ **STEP 6 — Full flow verified** against the local FastAPI server (402 / memories / 403)
+- ⚪ STEP 4 — Cloudflare Worker deploy still pending (FastAPI fallback works today)
+
+**Live values (already in `.env`):**
+```
+NEAR_CONTRACT_ID=aihackathon.testnet
+DEMO_CONSENT_TOKEN=0
+NEAR_RPC=https://rpc.testnet.fastnear.com
+PINECONE_INDEX_NAME=unified-memory
+PINECONE_HOST=unified-memory-rsv5o69.svc.aped-4627-b74a.pinecone.io
+```
+
+> ⚠️ `rpc.testnet.near.org` is dead — use FastNEAR. For the classic near-cli,
+> `export NEAR_TESTNET_RPC=https://rpc.testnet.fastnear.com` before any `near` command.
+> When compiling the contract, the `wasi-stub` step is mandatory (see `AGENT.md`).
+
+---
+
 ## STEP 1 — Clone the repo (2 min)
 
 ```bash
@@ -116,9 +140,10 @@ wrangler deploy
 
 ```bash
 # From repo root:
-uv run python -c "from ingestion.synthesis import load_demo_memories; load_demo_memories('demo-user')"
+# Namespace MUST equal the demo token id so recall_memory finds the data:
+uv run python -c "from ingestion.synthesis import load_demo_memories; load_demo_memories('0')"
 
-# You should see: "✅ Total synthesized: 30 memories for user demo-user"
+# You should see: "✅ Done: 30 memories for 0"
 # This loads all synthetic demo data into Pinecone so the demo works instantly
 ```
 
@@ -211,13 +236,14 @@ synthesize_batch(memories, 'real-user')
 
 ## CHECKLIST — Platform Is Live When All Are ✅
 
-- [ ] `NEAR ConsentNFT` deployed and callable on testnet
+- [x] `NEAR ConsentNFT` deployed and callable on testnet (`aihackathon.testnet`)
 - [ ] `MCP Worker` live at workers.dev URL — test: `curl https://YOUR-WORKER.workers.dev/.well-known/mcp`
-- [ ] `Pinecone index` has >30 memories loaded
+- [x] `Pinecone index` has 30 memories loaded (namespace `0`)
+- [x] MCP flow verified via local FastAPI: 402 / memories / 403
 - [ ] `uv run python demo/agent.py` runs all 4 scenarios without errors
-- [ ] `Revocation scenario` blocks the agent and shows reason
+- [ ] `Revocation scenario` blocks the agent and shows reason (needs live `revoke_consent` call)
 - [ ] `Frontend` live on Vercel with connect buttons working
-- [ ] `Demo consent token` minted and saved in .env
+- [x] `Demo consent token` minted (`0`) and saved in .env
 
 ---
 
