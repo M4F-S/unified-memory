@@ -176,6 +176,22 @@ Live contract: `aihackathon.testnet`, demo token `0`.
 | POST | `/ingest/trigger` | ingest.js | NEAR token |
 | POST | `/ingest/trigger/batch` | ingest.js | NEAR token |
 | GET | `/ingest/status/:job_id` | ingest.js | none |
-| GET | `/health` | local_server.py only | none |
+| POST | `/api/mint` | local_server.py only | signer key |
+| POST | `/api/revoke/:token_id` | local_server.py only | signer key |
+| GET | `/api/consent/:token_id` | local_server.py only | none |
+| GET | `/health` | mcp-server.js + local_server.py | none |
 
 Full request/response shapes are in `AGENT_BRIEF.md`.
+
+### Consent-management endpoints (`/api/*`) — FastAPI host only
+
+These SIGN NEAR transactions (mint/revoke), so they shell out to `near-cli` via
+`demo/near_consent.py` and only run on the FastAPI host (the Cloudflare Worker
+can't sign on-chain). The frontend consent/onboard/dashboard pages call these.
+
+- `POST /api/mint` — body `{agent_id?, platforms?[], types?[], max_queries?, max_usdc?, expires_days?}` (all optional → full demo scope). Returns `{token_id, tx_hash, explorer_url}`.
+- `POST /api/revoke/:token_id` — real on-chain revoke. Returns `{status, token_id, tx_hash, explorer_url}`. **Refuses token `0`** (protected baseline; revoke is irreversible) with `409`.
+- `GET /api/consent/:token_id` — view-only. Returns `{token_id, status, agent_id, owner, platforms, types, max_queries, queries_used, max_usdc_budget, usdc_spent, expires_at}`. Unknown token → `404`.
+
+Note: after mint/revoke, NEAR view nodes lag ~1–2s before reflecting the new
+state (poll `/api/consent/:id` until `status` flips).
