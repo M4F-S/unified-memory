@@ -2,6 +2,11 @@ name = "unified-memory-mcp"
 main = "mcp-server.js"
 compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+routes = [
+  { pattern = "unified-memory-mcp.mohamedfathy7.workers.dev", custom_domain = true }
+]
 
 [vars]
 NEAR_CONTRACT_ID      = "aihackathon.testnet"
