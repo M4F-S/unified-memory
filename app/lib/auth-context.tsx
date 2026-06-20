@@ -5,7 +5,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
-import { AuthUser, registerUser, loginUser, fetchMe } from "./auth-api";
+import { AuthUser, registerUser, loginUser, getMe } from "./auth-api";
 
 const TOKEN_KEY = "um-auth-token";
 
@@ -32,9 +32,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    fetchMe(stored).then((res) => {
-      if (res.ok) {
-        setUser(res.data);
+    getMe(stored).then((res) => {
+      if (res.ok && res.data) {
+        setUser(res.data || null);
         setToken(stored);
       } else {
         localStorage.removeItem(TOKEN_KEY);
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await loginUser(email, password);
-      if (res.ok) {
+      if (res.ok && res.data) {
         persist(res.data.token, { id: res.data.id, email: res.data.email });
         return { ok: true };
       }
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(
     async (email: string, password: string) => {
       const res = await registerUser(email, password);
-      if (res.ok) {
+      if (res.ok && res.data) {
         persist(res.data.token, { id: res.data.id, email: res.data.email });
         return { ok: true };
       }

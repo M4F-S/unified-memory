@@ -1,54 +1,49 @@
 // app/lib/auth-api.ts
-// Thin client for the FastAPI /auth/* endpoints. Mirrors the {ok, status, data}
-// shape used by lib/api.ts so callers handle results uniformly.
+// Thin client for the FastAPI /auth/* endpoints.
 
-const API_URL = process.env.NEXT_PUBLIC_MCP_URL || "http://localhost:8000";
+const API_URL = ""; // relative paths — same origin
 
-export interface AuthUser {
-  id: string;
-  email: string;
-}
-
-export interface AuthResult<T> {
-  ok: boolean;
-  status: number;
-  data: T;
-  error?: string;
-}
-
-async function request<T>(path: string, init: RequestInit): Promise<AuthResult<T>> {
+async function request<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<{ ok: boolean; status: number; data?: T; error?: string }> {
   try {
     const r = await fetch(`${API_URL}${path}`, {
-      headers: { "Content-Type": "application/json", ...(init.headers || {}) },
-      ...init,
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
     });
-    const data = await r.json().catch(() => ({}));
+
+    const body = await r.json().catch(() => ({}));
     if (!r.ok) {
-      return { ok: false, status: r.status, data: data as T, error: (data as { detail?: string }).detail || "Request failed" };
+      return { ok: false, status: r.status, error: body.detail || body.error || `HTTP ${r.status}` };
     }
-    return { ok: true, status: r.status, data: data as T };
-  } catch {
-    return { ok: false, status: 0, data: {} as T, error: "Could not reach the server" };
+    return { ok: true, status: r.status, data: body };
+  } catch (e) {
+    return { ok: false, status: 0, error: "Could not reach the server" };
   }
 }
 
-export function registerUser(email: string, password: string) {
+export type AuthUser = { id: string; email: string };
+
+export async function registerUser(email: string, password: string) {
   return request<AuthUser & { token: string }>("/auth/register", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 }
 
-export function loginUser(email: string, password: string) {
+export async function loginUser(email: string, password: string) {
   return request<AuthUser & { token: string }>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 }
 
-export function fetchMe(token: string) {
+export async function getMe(token: string) {
   return request<AuthUser>("/auth/me", {
-    method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
 }
