@@ -9,7 +9,6 @@ const links = [
   { href: "/onboard", label: "Onboard" },
   { href: "/consent", label: "Consent" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/demo", label: "Demo" },
 ];
 
 export default function Nav() {
@@ -43,8 +42,6 @@ export default function Nav() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
-
-  const isDemoPage = pathname === "/demo";
 
   return (
     <>
@@ -116,13 +113,6 @@ export default function Nav() {
                 </Link>
               </div>
             )
-          )}
-
-          {/* Live Demo button - hide on demo page */}
-          {!isDemoPage && (
-            <Link href="/demo" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
-              Live Demo
-            </Link>
           )}
 
           {/* Mobile hamburger */}
@@ -212,13 +202,6 @@ export default function Nav() {
                   </>
                 )
               )}
-              <Link
-                href="/demo"
-                onClick={() => setMobileOpen(false)}
-                className="btn-primary text-sm px-5 py-2.5 w-full text-center block"
-              >
-                Live Demo
-              </Link>
             </div>
           </div>
         </>

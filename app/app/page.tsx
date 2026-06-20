@@ -195,7 +195,7 @@ export default function Home() {
             animationDelay: "0.05s",
           }}
         >
-          <TrophyIcon size={14} className="inline-block align-text-bottom" /> AI Agents Berlin Hackathon 2026 \u00B7 42Berlin
+          <TrophyIcon size={14} className="inline-block align-text-bottom" /> AI Agents Berlin Hackathon 2026 · 42Berlin
         </div>
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-7 animate-fade-up"
@@ -207,7 +207,7 @@ export default function Home() {
           }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] animate-badge-pulse" />
-          Now in Beta \u00B7 20+ Platforms Connected
+          Now in Beta · 20+ Platforms Connected
         </div>
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6 animate-fade-up" style={{ animationDelay: "0.2s" }}>
           Your entire digital life.
@@ -218,22 +218,11 @@ export default function Home() {
           className="text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-11 animate-fade-up px-2 sm:px-0"
           style={{ color: "var(--text-secondary)", animationDelay: "0.35s" }}
         >
-          UnifiedMemory collects your data from every platform \u2014 Gmail, GitHub, ChatGPT, Spotify, Instagram and 15+ more \u2014 and gives your AI agents secure, consent-controlled access via a single MCP endpoint.
+          UnifiedMemory collects your data from every platform — Gmail, GitHub, ChatGPT, Spotify, Instagram and 15+ more — and gives your AI agents secure, consent-controlled access via a single MCP endpoint.
         </p>
         <div className="flex gap-3.5 flex-wrap justify-center animate-fade-up" style={{ animationDelay: "0.5s" }}>
           <Link href="/onboard" className="btn-primary">
             Start Building Memory
-          </Link>
-          <Link
-            href="/demo"
-            className="px-7 py-3.5 rounded-xl font-semibold border transition-all"
-            style={{
-              color: "var(--text-primary)",
-              borderColor: "var(--border-strong)",
-              background: "var(--surface)",
-            }}
-          >
-            See Live Demo \u2192
           </Link>
         </div>
 
@@ -335,14 +324,14 @@ export default function Home() {
             Five steps to <span className="gradient-text">total memory</span>
           </h2>
           <p className="text-center max-w-xl mx-auto mb-14" style={{ color: "var(--text-secondary)" }}>
-            Connect once. Synthesize everything. Give your agents exactly the context they need \u2014 with you in control.
+            Connect once. Synthesize everything. Give your agents exactly the context they need — with you in control.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { n: "1", title: "Connect Platforms", desc: "Authorize via OAuth or upload your GDPR data export. We support 20+ platforms and automatically file DSAR requests on your behalf." },
               { n: "2", title: "Synthesize Memory", desc: "GPT-4o classifies every data point into 5 memory types, generates embeddings, and stores them in a searchable vector graph." },
-              { n: "3", title: "Mint Consent NFT", desc: "Define exactly what your agent can access: platforms, memory types, query budget, and expiry. Minted on NEAR blockchain \u2014 immutable proof." },
-              { n: "4", title: "Agent Queries MCP", desc: "Any AI agent \u2014 ChatGPT, Claude, or your own \u2014 queries your memory via our MCP endpoint. Each query costs 0.001 USDC via Circle x402." },
+              { n: "3", title: "Mint Consent NFT", desc: "Define exactly what your agent can access: platforms, memory types, query budget, and expiry. Minted on NEAR blockchain — immutable proof." },
+              { n: "4", title: "Agent Queries MCP", desc: "Any AI agent — ChatGPT, Claude, or your own — queries your memory via our MCP endpoint. Each query costs 0.001 USDC via Circle x402." },
               { n: "5", title: "Revoke Anytime", desc: "Burn the Consent NFT on NEAR. All agent access stops instantly. The revocation is permanently logged on-chain. You stay in control." },
             ].map((s) => (
               <div key={s.n} className="glow-card p-7 blur-reveal">
@@ -432,7 +421,7 @@ export default function Home() {
               { icon: <LinkIcon size={22} />, title: "On-Chain Consent", desc: "Consent NFTs on NEAR blockchain give you cryptographic proof of what agents can access. Revocation is instant and permanent." },
               { icon: <BoltIcon size={22} />, title: "x402 Micropayments", desc: "Agents pay 0.001 USDC per memory query via Circle's x402 protocol. The first AI memory system with native micropayment economics." },
               { icon: <RobotIcon size={22} />, title: "Agent-Agnostic MCP", desc: "One MCP endpoint works with ChatGPT, Claude, Gemini, or any custom agent. Your memory travels with you regardless of which AI you use." },
-              { icon: <DnaIcon size={22} />, title: "Merkle Provenance", desc: "Every memory is tamper-evident \u2014 traced to its source via a cryptographic Merkle-DAG. Agents know exactly where each memory came from." },
+              { icon: <DnaIcon size={22} />, title: "Merkle Provenance", desc: "Every memory is tamper-evident — traced to its source via a cryptographic Merkle-DAG. Agents know exactly where each memory came from." },
               { icon: <SatelliteIcon size={22} />, title: "EAS Attestations", desc: "Every agent query is logged as an Ethereum Attestation Service record on Base Sepolia. Permanent, public proof of every memory access event." },
             ].map((f) => (
               <div key={f.title} className="feature-card blur-reveal">
@@ -456,7 +445,7 @@ export default function Home() {
       <section className="px-4 sm:px-6 pb-16 sm:pb-24 text-center">
         <div className="max-w-3xl mx-auto">
           <span className="block text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#7c3aed" }}>
-            Live Demo
+            Consent Control Demo
           </span>
           <h2 className="text-3xl md:text-5xl font-extrabold mb-4">
             Revoke in <span className="gradient-text">real time</span>
@@ -468,7 +457,7 @@ export default function Home() {
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-nft-pulse" />
               <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
-                Consent NFT #001 \u00B7 NEAR Testnet
+                Consent NFT #001 · NEAR Testnet
               </span>
             </div>
             <div className="space-y-2 text-sm">
@@ -532,7 +521,7 @@ export default function Home() {
             <span className="gradient-text">real memory</span>
           </h2>
           <p className="mb-9" style={{ color: "var(--text-secondary)" }}>
-            Join the waitlist for early access to UnifiedMemory \u2014 the first platform that gives AI agents a complete, consent-controlled view of your digital life.
+            Join the waitlist for early access to UnifiedMemory — the first platform that gives AI agents a complete, consent-controlled view of your digital life.
           </p>
           <div className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto px-4 sm:px-0">
             <input
@@ -557,10 +546,10 @@ export default function Home() {
       >
         <span className="font-bold text-lg gradient-text"><BrainIcon size={18} className="inline-block align-text-bottom" /> UnifiedMemory</span>
         <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-          AI Agents Berlin Hackathon 2026 \u00B7 Built at 42Berlin
+          AI Agents Berlin Hackathon 2026 · Built at 42Berlin
         </span>
         <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-          GDPR Compliant \u00B7 NEAR \u00B7 Circle \u00B7 Cloudflare MCP
+          GDPR Compliant · NEAR · Circle · Cloudflare MCP
         </span>
       </footer>
     </div>
