@@ -74,6 +74,19 @@ describe('GET /ingest/connectors', () => {
     const chatgpt = connectors.find(c => c.platform === 'chatgpt')
     expect(chatgpt).toBeDefined()
     expect(chatgpt.auth).toBe('upload')
+    expect(chatgpt.tier).toBe(2)
+  })
+
+  it('marks dsar connectors as coming soon', async () => {
+    const r = await req('/ingest/connectors')
+    const { connectors } = await r.json()
+    const dsar = connectors.filter(c => c.auth === 'dsar')
+    expect(dsar).toHaveLength(5)
+    for (const c of dsar) {
+      expect(c.coming_soon).toBe(true)
+      expect(c.available).toBe(false)
+      expect(c.tier).toBe(3)
+    }
   })
 })
 
@@ -243,5 +256,40 @@ describe('GET /ingest/status/:job_id', () => {
     const r = await req('/ingest/status/job_abc123')
     const body = await r.json()
     expect(body).toHaveProperty('status')
+  })
+})
+
+// ── POST /ingest/upload ───────────────────────────────────────────────────────
+
+describe('POST /ingest/upload', () => {
+  async function uploadReq(form) {
+    return app.fetch(
+      new Request('http://localhost/ingest/upload', { method: 'POST', body: form }),
+      MOCK_ENV,
+      MOCK_CTX,
+    )
+  }
+
+  it('returns 400 when file missing', async () => {
+    const form = new FormData()
+    form.append('platform', 'chatgpt')
+    form.append('token_id', '0')
+    form.append('user_id', 'alice')
+    const r = await uploadReq(form)
+    expect(r.status).toBe(400)
+  })
+
+  it('queues upload job with filename', async () => {
+    const form = new FormData()
+    form.append('platform', 'chatgpt')
+    form.append('token_id', '0')
+    form.append('user_id', 'alice')
+    form.append('file', new File(['{"x":1}'], 'conversations.json', { type: 'application/json' }))
+    const r = await uploadReq(form)
+    expect(r.status).toBe(200)
+    const body = await r.json()
+    expect(body.job_id).toMatch(/^job_/)
+    expect(body.filename).toBe('conversations.json')
+    expect(body.platform).toBe('chatgpt')
   })
 })
