@@ -1,0 +1,7 @@
+DEFINE_NEAR_METHOD(get_consent)
+DEFINE_NEAR_METHOD(get_consents_by_owner)
+DEFINE_NEAR_METHOD(init)
+DEFINE_NEAR_METHOD(mint_consent)
+DEFINE_NEAR_METHOD(record_query)
+DEFINE_NEAR_METHOD(revoke_consent)
+DEFINE_NEAR_METHOD(validate_query)

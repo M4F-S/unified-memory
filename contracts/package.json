@@ -1,0 +1,13 @@
+{
+  "name": "unified-memory-contracts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "near-sdk-js build consent_nft_src.js consent_nft.wasm package.json",
+    "deploy:dev": "near dev-deploy consent_nft.wasm",
+    "deploy": "near deploy --accountId $NEAR_ACCOUNT_ID --wasmFile consent_nft.wasm"
+  },
+  "dependencies": {
+    "near-sdk-js": "^1.0.0"
+  }
+}
