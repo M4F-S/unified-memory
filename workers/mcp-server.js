@@ -54,12 +54,12 @@ async function classifyMemory(content, source, env) {
   return JSON.parse(data.choices[0].message.content);
 }
 
-async function pineconeQuery(embedding, filter, topK, env) {
+async function pineconeQuery(embedding, filter, topK, namespace, env) {
   const host = env.PINECONE_HOST; // e.g. unified-memory-abc123.svc.gcp-starter.pinecone.io
   const resp = await fetch(`https://${host}/query`, {
     method: 'POST',
     headers: { 'Api-Key': env.PINECONE_API_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vector: embedding, filter, topK, includeMetadata: true })
+    body: JSON.stringify({ vector: embedding, filter, topK, namespace, includeMetadata: true })
   });
   const data = await resp.json();
   return data.matches || [];
@@ -138,6 +138,9 @@ app.get('/.well-known/mcp', (c) => c.json({
   ]
 }));
 
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/health', (c) => c.json({ status: 'ok', service: 'UnifiedMemory MCP Worker' }));
+
 // ── recall_memory ─────────────────────────────────────────────────────────────
 app.post('/mcp/recall_memory', async (c) => {
   const { query, memory_type = 'all', platform = 'all', token_id } = await c.req.json();
@@ -167,7 +170,7 @@ app.post('/mcp/recall_memory', async (c) => {
   if (memory_type !== 'all') filter.memory_type = { '$eq': memory_type };
   if (platform !== 'all')    filter.platform     = { '$eq': platform };
 
-  const matches = await pineconeQuery(embedding, filter, 5, c.env);
+  const matches = await pineconeQuery(embedding, filter, 5, token_id, c.env);
 
   // 4. EAS attestation + NEAR record_query (fire and forget)
   const queryHash = '0x' + Array.from(

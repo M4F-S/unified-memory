@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light dark" />
+  <title>Connect Platforms — UnifiedMemory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --um-text: #1a1035;
+      --um-text-muted: #64748b;
+      --um-primary: #7c3aed;
+      --um-primary-light: #8b5cf6;
+      --um-primary-soft: rgba(124, 58, 237, 0.1);
+      --um-primary-border: rgba(124, 58, 237, 0.25);
+      --um-blue: #2563eb;
+      --um-upload: #b45309;
+      --um-upload-soft: rgba(251, 191, 36, 0.14);
+      --border: rgba(160, 130, 230, 0.22);
+      --um-bg: linear-gradient(160deg, #f5f3ff 0%, #faf8ff 50%, #f0f9ff 100%);
+      --um-surface: #fff;
+      --um-nav-bg: rgba(255, 255, 255, 0.82);
+      --um-row-bg: #fff;
+      --um-row-connected: linear-gradient(90deg, rgba(237, 233, 254, 0.5), #fff);
+      --um-progress-track: #ede9fe;
+      --um-shadow: 0 4px 24px rgba(124, 58, 237, 0.07);
+    }
+    html.dark {
+      --um-text: #f3efff;
+      --um-text-muted: #b2a8cf;
+      --um-primary-light: #c4b5fd;
+      --um-primary-soft: rgba(124, 58, 237, 0.18);
+      --um-primary-border: rgba(167, 139, 250, 0.35);
+      --border: rgba(160, 130, 230, 0.15);
+      --um-bg: linear-gradient(160deg, #0d0a1a 0%, #140f2d 50%, #0a1020 100%);
+      --um-surface: rgba(255, 255, 255, 0.07);
+      --um-nav-bg: rgba(13, 10, 26, 0.85);
+      --um-row-bg: rgba(255, 255, 255, 0.05);
+      --um-row-connected: linear-gradient(90deg, rgba(124, 58, 237, 0.15), rgba(255, 255, 255, 0.05));
+      --um-progress-track: #2d2640;
+      --um-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--um-text);
+      min-height: 100vh;
+      background: var(--um-bg);
+      position: relative;
+    }
+    .page-art {
+      position: fixed; top: 72px; right: max(-48px, -5vw);
+      width: min(320px, 42vw); opacity: 0.16; pointer-events: none; z-index: 0;
+      mask-image: linear-gradient(to left, black 40%, transparent 100%);
+    }
+    html.dark .page-art {
+      opacity: 0.08;
+      filter: brightness(0.4);
+      mix-blend-mode: soft-light;
+    }
+    main { max-width: 720px; margin: 0 auto; padding: 96px 20px 64px; position: relative; z-index: 1; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 64px;
+      background: var(--um-nav-bg);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; font-weight: 700; font-size: 1rem; color: var(--um-text);
+    }
+    .nav-logo-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--um-primary), var(--um-blue));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-back {
+      color: var(--um-text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle {
+      width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--um-primary-border);
+      background: var(--um-primary-soft); cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .theme-toggle:hover { opacity: 0.9; }
+
+    /* CRITICAL: never put gradient-text on a parent of platform names — children inherit transparent fill */
+
+    .page-title {
+      font-size: clamp(1.85rem, 5vw, 2.35rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      margin-bottom: 10px; line-height: 1.15;
+      color: var(--um-text);
+      -webkit-text-fill-color: var(--um-text);
+    }
+    .page-title .accent {
+      background: linear-gradient(135deg, var(--um-primary), var(--um-blue));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: var(--um-text-muted); font-size: 0.95rem; line-height: 1.6;
+      margin-bottom: 28px;
+      -webkit-text-fill-color: var(--um-text-muted);
+    }
+
+    .progress-card {
+      background: var(--um-surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 20px; margin-bottom: 24px;
+      box-shadow: var(--um-shadow);
+    }
+    .progress-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 10px; gap: 12px; flex-wrap: wrap;
+    }
+    .progress-count { font-size: 1.1rem; font-weight: 800; color: var(--um-text); -webkit-text-fill-color: var(--um-text); }
+    .progress-count strong { color: var(--um-primary); -webkit-text-fill-color: var(--um-primary); }
+    .progress-hint { font-size: 0.8rem; color: var(--um-text-muted); -webkit-text-fill-color: var(--um-text-muted); }
+    .progress-track { height: 8px; background: var(--um-progress-track); border-radius: 999px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--um-primary), var(--um-blue));
+      border-radius: 999px; transition: width 0.4s ease;
+    }
+
+    .tier-tabs {
+      display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;
+    }
+    .tier-tab {
+      padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--um-surface); font-family: inherit; font-size: 0.78rem; font-weight: 600;
+      color: var(--um-text); cursor: pointer; white-space: nowrap;
+      -webkit-text-fill-color: var(--um-text);
+    }
+    .tier-tab.active {
+      background: var(--um-primary); color: #fff; border-color: var(--um-primary);
+      -webkit-text-fill-color: #fff;
+    }
+    .tier-tab.disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .platform-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .platform-row {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--um-row-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px;
+      box-shadow: var(--um-shadow);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .platform-row.connected {
+      border-color: var(--um-primary-border);
+      background: var(--um-row-connected);
+    }
+    .platform-row.coming-soon { opacity: 0.65; }
+
+    .row-icon {
+      font-size: 1.5rem; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--um-primary-soft); border-radius: 10px; flex-shrink: 0;
+    }
+    .row-body { flex: 1; min-width: 0; }
+
+    .row-title {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px;
+    }
+    /* Names MUST be explicit — do not rely on inherited color or um-text alone */
+    .platform-name {
+      font-weight: 700; font-size: 0.95rem;
+      color: var(--um-text) !important;
+      -webkit-text-fill-color: var(--um-text) !important;
+    }
+    .row-memories {
+      font-size: 0.8rem; color: var(--um-text-muted);
+      -webkit-text-fill-color: var(--um-text-muted);
+    }
+
+    .badge {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 999px; flex-shrink: 0;
+    }
+    .badge-connected {
+      color: var(--um-primary-light); background: var(--um-primary-soft);
+      border: 1px solid var(--um-primary-border);
+      -webkit-text-fill-color: var(--um-primary-light);
+    }
+    .badge-idle {
+      color: var(--um-primary); background: var(--um-primary-soft);
+      border: 1px solid var(--um-primary-border);
+      -webkit-text-fill-color: var(--um-primary);
+    }
+    .badge-upload {
+      color: var(--um-upload); background: var(--um-upload-soft);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      -webkit-text-fill-color: var(--um-upload);
+    }
+    .badge-soon {
+      color: #64748b; background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      -webkit-text-fill-color: #64748b;
+    }
+
+    .row-action {
+      flex-shrink: 0; padding: 8px 16px; border-radius: 10px;
+      font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      border: none; transition: opacity 0.2s;
+    }
+    .btn-manage {
+      background: var(--um-primary-soft); color: var(--um-primary);
+      border: 1px solid var(--um-primary-border);
+      -webkit-text-fill-color: var(--um-primary);
+    }
+    .btn-manage:hover { background: rgba(124, 58, 237, 0.16); }
+    .btn-connect {
+      background: linear-gradient(135deg, var(--um-primary), var(--um-blue));
+      color: #fff; -webkit-text-fill-color: #fff;
+      box-shadow: 0 3px 10px rgba(124, 58, 237, 0.25);
+    }
+    .btn-connect:hover { opacity: 0.92; }
+    .btn-upload {
+      background: var(--um-upload-soft); color: var(--um-upload);
+      border: 1px dashed rgba(251, 191, 36, 0.5);
+      -webkit-text-fill-color: var(--um-upload);
+    }
+    .btn-disabled {
+      background: #f1f5f9; color: #94a3b8; cursor: not-allowed;
+      -webkit-text-fill-color: #94a3b8;
+    }
+
+    .skeleton-row {
+      height: 72px; border-radius: 14px;
+      background: linear-gradient(90deg, #f3f0ff 25%, #ede9fe 50%, #f3f0ff 75%);
+      background-size: 200% 100%; animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .dsar-note {
+      margin-top: 28px; padding: 20px; text-align: center;
+      border-radius: 14px; border: 1px dashed var(--um-primary-border);
+      background: var(--um-primary-soft);
+    }
+    .dsar-note p { font-size: 0.85rem; color: var(--um-text-muted); -webkit-text-fill-color: var(--um-text-muted); }
+
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(26,16,53,0.45); align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--um-surface); border-radius: 16px; padding: 24px; max-width: 400px; width: 100%;
+    }
+    .modal h3 { color: var(--um-text); -webkit-text-fill-color: var(--um-text); margin-bottom: 8px; }
+    .modal p { color: var(--um-text-muted); font-size: 0.88rem; margin-bottom: 16px; line-height: 1.5; }
+    .modal input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 12px; font-family: inherit;
+      color: var(--um-text); -webkit-text-fill-color: var(--um-text);
+    }
+    .modal-actions { display: flex; gap: 8px; }
+    .modal-actions button { flex: 1; padding: 10px; border-radius: 10px; font-family: inherit; font-weight: 600; cursor: pointer; border: none; }
+    .modal-cancel { background: #f1f5f9; color: var(--um-text-muted); }
+    .modal-confirm { background: var(--um-primary); color: #fff; }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--um-text); color: #fff; padding: 11px 18px;
+      border-radius: 10px; font-size: 0.84rem; z-index: 400;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    .drop-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(124,58,237,0.1); border: 4px dashed var(--um-primary);
+      align-items: center; justify-content: center;
+      font-weight: 700; color: var(--um-primary); font-size: 1.1rem;
+    }
+    .drop-overlay.visible { display: flex; }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+
+<img class="page-art" src="assets/onboard-accent.png" alt="" aria-hidden="true" width="320" height="320"/>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    UnifiedMemory
+  </a>
+  <div class="nav-actions">
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"><span id="themeIcon">🌙</span></button>
+    <a class="nav-back" href="index.html">← Back</a>
+  </div>
+</nav>
+
+<main>
+  <h1 class="page-title">Connect your <span class="accent">platforms</span></h1>
+  <p class="subtitle">Link your digital life sources. OAuth in one click, or drop an export file — no terminal needed.</p>
+
+  <div class="progress-card">
+    <div class="progress-top">
+      <div class="progress-count"><strong id="connectedNum">0</strong> of 20 connected</div>
+      <div class="progress-hint" id="progressHint">Start with Gmail, GitHub, or Spotify</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="tier-tabs">
+    <button type="button" class="tier-tab active" data-tier="all">All</button>
+    <button type="button" class="tier-tab" data-tier="1">OAuth (9)</button>
+    <button type="button" class="tier-tab" data-tier="2">Import (6)</button>
+    <button type="button" class="tier-tab disabled" data-tier="3">DSAR soon</button>
+  </div>
+
+  <ul class="platform-list" id="skeletonList">
+    <li class="skeleton-row"></li><li class="skeleton-row"></li><li class="skeleton-row"></li>
+    <li class="skeleton-row"></li><li class="skeleton-row"></li>
+  </ul>
+  <ul class="platform-list" id="platformList" style="display:none"></ul>
+
+  <div class="dsar-note">
+    <p><strong style="color:var(--um-primary)">DSAR Autopilot</strong> — Twitter, LinkedIn, Instagram, Facebook, TikTok — coming soon.</p>
+  </div>
+</main>
+
+<div class="drop-overlay" id="dropOverlay">Drop export here</div>
+<div class="modal-backdrop" id="oauthModal">
+  <div class="modal"><h3 id="oauthTitle">Connect</h3><p id="oauthDesc"></p>
+    <div class="modal-actions">
+      <button type="button" class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button type="button" class="modal-confirm" id="oauthConfirm">Authorize</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="apiKeyModal">
+  <div class="modal"><h3 id="apiKeyTitle">API key</h3><p>Paste your token — stored encrypted.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-…" autocomplete="off"/>
+    <div class="modal-actions">
+      <button type="button" class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button type="button" class="modal-confirm" id="apiKeyConfirm">Connect</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileInput" accept=".json,.zip,.txt,.xml,.csv"/>
+
+<script>
+const MCP_URL = 'https://unified-memory-mcp.rapid-king-4a64.workers.dev';
+const DEMO_TOKEN = '0', DEMO_USER = 'demo-user', TOTAL = 20, STORAGE_KEY = 'um_connected';
+
+const ICONS = {
+  gmail:'📧', github:'🐙', spotify:'🎵', notion:'📓', slack:'💬', discord:'🎮',
+  reddit:'🤙', telegram:'✈️', google_fit:'🏃', chatgpt:'🤖', claude:'🟠',
+  whatsapp:'💬', apple_health:'❤️', apple_mail:'✉️', youtube:'▶️',
+  twitter:'🐦', linkedin:'💼', instagram:'📸', facebook:'👥', tiktok:'🎵'
+};
+const DEMO_MEMORIES = {
+  gmail:847, github:312, spotify:1240, chatgpt:203, slack:560, notion:94,
+  discord:88, reddit:420, telegram:55, google_fit:365, claude:180,
+  whatsapp:890, apple_health:365, apple_mail:120, youtube:4200
+};
+
+let connectors = [], connected = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '["gmail","github","spotify","chatgpt","slack","notion"]'));
+let activeTier = 'all', pendingPlatform = null, pendingUploadPlatform = null;
+
+function showList() {
+  document.getElementById('skeletonList').style.display = 'none';
+  document.getElementById('platformList').style.display = 'flex';
+}
+function saveConnected() { localStorage.setItem(STORAGE_KEY, JSON.stringify([...connected])); updateProgress(); renderList(); }
+function updateProgress() {
+  const n = connected.size;
+  document.getElementById('connectedNum').textContent = n;
+  document.getElementById('progressBar').style.width = `${(n/TOTAL)*100}%`;
+  const h = document.getElementById('progressHint');
+  if (n >= TOTAL) h.textContent = 'All platforms connected';
+  else if (n === 0) h.textContent = 'Start with Gmail, GitHub, or Spotify';
+  else h.textContent = `${TOTAL-n} remaining`;
+}
+function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function closeModal() { document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.remove('open')); pendingPlatform=null; }
+
+async function triggerIngest(p) {
+  try { await fetch(`${MCP_URL}/ingest/trigger`, { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ user_id:DEMO_USER, platform:p, token_id:DEMO_TOKEN }) }); } catch {}
+}
+async function pollJob(id, p, label) {
+  for (let i=0;i<12;i++) {
+    await new Promise(r=>setTimeout(r,800));
+    try {
+      const d = await (await fetch(`${MCP_URL}/ingest/status/${id}`)).json();
+      if (d.status==='completed') { connected.add(p); saveConnected(); toast(`✓ ${label} synced`); return; }
+    } catch { break; }
+  }
+  connected.add(p); saveConnected(); toast(`✓ ${label} connected`);
+}
+async function uploadFile(p, file) {
+  const label = connectors.find(c=>c.platform===p)?.label || p;
+  const form = new FormData();
+  form.append('platform',p); form.append('token_id',DEMO_TOKEN); form.append('user_id',DEMO_USER); form.append('file',file);
+  toast(`Importing ${file.name}…`);
+  try {
+    const d = await (await fetch(`${MCP_URL}/ingest/upload`,{method:'POST',body:form})).json();
+    if (d.job_id) await pollJob(d.job_id,p,label); else { connected.add(p); saveConnected(); }
+  } catch { connected.add(p); saveConnected(); toast(`✓ ${label} imported`); }
+}
+
+function handleConnect(c) {
+  if (c.coming_soon) { toast('DSAR — coming soon'); return; }
+  if (connected.has(c.platform)) return;
+  if (c.tier===2||c.auth==='upload') { pendingUploadPlatform=c.platform; document.getElementById('fileInput').click(); return; }
+  pendingPlatform = c;
+  if (c.auth==='api_key') {
+    document.getElementById('apiKeyTitle').textContent = `Connect ${c.label}`;
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('apiKeyModal').classList.add('open');
+  } else {
+    document.getElementById('oauthTitle').textContent = `Connect ${c.label}`;
+    document.getElementById('oauthDesc').textContent = `Sign in with ${c.label}. Revoke anytime via NEAR.`;
+    document.getElementById('oauthModal').classList.add('open');
+  }
+}
+
+async function confirmConnect(btn) {
+  if (!pendingPlatform) return;
+  const { platform, label, auth } = pendingPlatform;
+  btn.disabled = true;
+  closeModal();
+  await new Promise(r=>setTimeout(r,1000));
+  await triggerIngest(platform);
+  connected.add(platform);
+  saveConnected();
+  toast(`✓ ${label} connected`);
+  pendingPlatform = null;
+  btn.disabled = false;
+}
+
+function renderList() {
+  const list = document.getElementById('platformList');
+  const filtered = connectors.filter(c => activeTier==='all' || String(c.tier)===activeTier);
+  list.innerHTML = filtered.map(c => {
+    const isConn = connected.has(c.platform);
+    const isSoon = c.coming_soon;
+    const mem = isConn ? (DEMO_MEMORIES[c.platform] || Math.floor(Math.random()*400+50)) : 0;
+    let badge, action;
+    if (isSoon) {
+      badge = '<span class="badge badge-soon">Coming soon</span>';
+      action = '<button type="button" class="row-action btn-disabled" disabled>Soon</button>';
+    } else if (isConn) {
+      badge = '<span class="badge badge-connected">Connected</span>';
+      action = `<button type="button" class="row-action btn-manage" data-platform="${c.platform}">Manage</button>`;
+    } else if (c.tier===2) {
+      badge = '<span class="badge badge-upload">Drop file</span>';
+      action = `<button type="button" class="row-action btn-upload" data-platform="${c.platform}">Import</button>`;
+    } else {
+      badge = '<span class="badge badge-idle">One click</span>';
+      action = `<button type="button" class="row-action btn-connect" data-platform="${c.platform}">Connect</button>`;
+    }
+    const memText = isConn ? `${mem.toLocaleString()} memories` : (c.tier===2 ? 'Drop your export file' : 'OAuth — one click');
+    return `<li class="platform-row ${isConn?'connected':''} ${isSoon?'coming-soon':''}">
+      <span class="row-icon">${ICONS[c.platform]||'🔗'}</span>
+      <div class="row-body">
+        <div class="row-title">
+          <span class="platform-name">${c.label}</span>${badge}
+        </div>
+        <span class="row-memories">${memText}</span>
+      </div>${action}
+    </li>`;
+  }).join('');
+
+  list.querySelectorAll('[data-platform]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = connectors.find(x => x.platform === btn.dataset.platform);
+      if (!c) return;
+      if (connected.has(c.platform) && btn.classList.contains('btn-manage')) {
+        toast(`${c.label} — sync settings (demo)`); return;
+      }
+      handleConnect(c);
+    });
+  });
+}
+
+document.getElementById('oauthConfirm').onclick = e => confirmConnect(e.target);
+document.getElementById('apiKeyConfirm').onclick = e => confirmConnect(e.target);
+document.getElementById('fileInput').onchange = e => {
+  if (e.target.files[0] && pendingUploadPlatform) { uploadFile(pendingUploadPlatform, e.target.files[0]); pendingUploadPlatform=null; }
+  e.target.value = '';
+};
+document.querySelectorAll('.tier-tab').forEach(tab => {
+  tab.onclick = () => {
+    if (tab.classList.contains('disabled')) { toast('DSAR — coming soon'); return; }
+    document.querySelectorAll('.tier-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active'); activeTier = tab.dataset.tier; renderList();
+  };
+});
+
+let dragDepth = 0;
+document.body.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; document.getElementById('dropOverlay').classList.add('visible'); });
+document.body.addEventListener('dragleave', e => { e.preventDefault(); if (--dragDepth<=0) { dragDepth=0; document.getElementById('dropOverlay').classList.remove('visible'); } });
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault(); dragDepth=0; document.getElementById('dropOverlay').classList.remove('visible');
+  const f = e.dataTransfer.files[0]; if (!f) return;
+  const t = connectors.filter(c=>c.tier===2&&!c.coming_soon).find(c=>!connected.has(c.platform)) || connectors.find(c=>c.tier===2);
+  if (t) uploadFile(t.platform, f);
+});
+
+async function init() {
+  updateProgress();
+  try {
+    connectors = (await (await fetch(`${MCP_URL}/ingest/connectors`)).json()).connectors || [];
+  } catch {
+    connectors = [
+      { platform:'gmail', tier:1, auth:'oauth2', label:'Gmail' },
+      { platform:'github', tier:1, auth:'oauth2', label:'GitHub' },
+      { platform:'spotify', tier:1, auth:'oauth2', label:'Spotify' },
+      { platform:'chatgpt', tier:2, auth:'upload', label:'ChatGPT' },
+      { platform:'slack', tier:1, auth:'api_key', label:'Slack' },
+      { platform:'notion', tier:1, auth:'api_key', label:'Notion' }
+    ];
+  }
+  showList(); renderList();
+}
+init();
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

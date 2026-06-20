@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-# demo/agent.py — uses OpenRouter with kimi/kimi-k2.5 for agent reasoning
+# demo/agent.py — uses OpenRouter with moonshotai/kimi-k2 for agent reasoning
 # Run: python demo/agent.py
 
 import os, json, time
 import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
+
+from near_consent import revoke_consent, validate_query, NearError
 
 load_dotenv()
 
@@ -18,8 +20,11 @@ client = OpenAI(
     }
 )
 
-AGENT_MODEL   = os.getenv("OPENROUTER_SMART_MODEL", "kimi/kimi-k2.5")
-MCP_URL       = os.getenv("MCP_URL", "https://mcp.unified-memory.workers.dev")
+AGENT_MODEL   = os.getenv("OPENROUTER_SMART_MODEL", "moonshotai/kimi-k2")
+MCP_URL       = os.getenv("MCP_URL", "https://unified-memory-mcp.rapid-king-4a64.workers.dev")
+# Worker URL still a placeholder? Fall back to the local FastAPI server.
+if "YOUR-SUBDOMAIN" in MCP_URL or not MCP_URL:
+    MCP_URL = "http://localhost:8000"
 CONSENT_TOKEN = os.getenv("DEMO_CONSENT_TOKEN", "demo-token-001")
 
 TOOLS = [{"type":"function","function":{
@@ -52,6 +57,15 @@ def recall_memory(query, memory_type="all", platform="all"):
     return r
 
 
+def parse_tool_args(raw):
+    if isinstance(raw, dict):
+        return raw
+    args = json.loads(raw)
+    if isinstance(args, str):
+        args = json.loads(args)
+    return args if isinstance(args, dict) else {}
+
+
 def run_agent(task, label):
     print(f"\n{'='*65}\n🎯 {label}\n📋 {task}\n{'='*65}")
     messages = [
@@ -64,7 +78,8 @@ def run_agent(task, label):
         if msg.tool_calls:
             messages.append(msg)
             for tc in msg.tool_calls:
-                result = recall_memory(**json.loads(tc.function.arguments))
+                args = parse_tool_args(tc.function.arguments)
+                result = recall_memory(**{k: args[k] for k in ("query", "memory_type", "platform") if k in args})
                 messages.append({"role":"tool","tool_call_id":tc.id,"content":json.dumps(result)})
         else:
             print(f"\n🤖 {msg.content}")
@@ -81,9 +96,39 @@ def main():
     time.sleep(0.5)
 
     print("\n" + "🔴 "*15)
-    print("USER REVOKING CONSENT — burning NFT on NEAR blockchain...")
-    time.sleep(2)
-    print("✅ NFT revoked at block #87,432,910 — all access permanently blocked")
+    if CONSENT_TOKEN == "0":
+        # Token 0 is the shared, seeded baseline the API tests rely on — never burn it.
+        # revoke_consent is irreversible, so a real revoke here would break everything.
+        print("⚠️  DEMO_CONSENT_TOKEN=0 is the protected baseline — not revoking on-chain.")
+        print("   Run `uv run python demo/reset_consent.py` first for a REAL revoke.")
+        time.sleep(1.5)
+        print("✅ (simulated) consent revoked — all agent access blocked")
+    elif os.getenv("DEMO_SIMULATE_REVOKE") == "1":
+        print(f"USER REVOKING CONSENT — Consent NFT token {CONSENT_TOKEN}...")
+        time.sleep(1.5)
+        print("✅ (simulated) NFT revoked — all agent access permanently blocked")
+    else:
+        print(f"USER REVOKING CONSENT — burning Consent NFT (token {CONSENT_TOKEN}) on NEAR...")
+        try:
+            tx, url = revoke_consent(CONSENT_TOKEN)
+            print("✅ NFT revoked on-chain — all agent access permanently blocked")
+            if tx:
+                print(f"   🔗 Tx {tx}")
+                print(f"   🔍 {url}")
+            # Wait for the revoke to propagate to NEAR view nodes before Scenario D —
+            # otherwise the agent may read stale (still-valid) consent and NOT be blocked.
+            print("   ⏳ Waiting for on-chain propagation...")
+            for _ in range(10):
+                time.sleep(1.5)
+                try:
+                    if validate_query(CONSENT_TOKEN).get("valid") is False:
+                        print("   ✅ Confirmed revoked on-chain")
+                        break
+                except NearError:
+                    pass
+        except NearError as e:
+            # Demo safety net: never hard-crash on stage if NEAR is slow/unreachable.
+            print(f"⚠️  Live revoke failed ({str(e).splitlines()[0][:80]}) — showing simulated block")
     print("🔴 "*15 + "\n")
 
     run_agent("What emails did I receive today?", "D — POST-REVOCATION (must be BLOCKED)")

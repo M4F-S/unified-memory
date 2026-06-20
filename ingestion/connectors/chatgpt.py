@@ -9,7 +9,7 @@ class ChatGPTConnector:
 
     def fetch_data(self, export_file='conversations.json'):
         memories = []
-        with open(export_file, 'r') as f:
+        with open(export_file, 'r', encoding='utf-8') as f:
             conversations = json.load(f)
         for convo in conversations:
             title = convo.get('title', 'Untitled')

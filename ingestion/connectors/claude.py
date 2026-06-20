@@ -9,7 +9,7 @@ class ClaudeConnector:
 
     def fetch_data(self, export_file='claude_export.json'):
         memories = []
-        with open(export_file, 'r') as f:
+        with open(export_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         conversations = data if isinstance(data, list) else data.get('conversations', [])
         for convo in conversations:
