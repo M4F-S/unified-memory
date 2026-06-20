@@ -58,7 +58,7 @@ export default function Home() {
     });
 
     // Glow card mousemove
-    const cards = document.querySelectorAll(".glow-card, .feature-card");
+    const cards = document.querySelectorAll(".glow-card, .feature-card, .glass-card");
     const handler = (e: Event) => {
       const ev = e as MouseEvent;
       const card = ev.currentTarget as HTMLElement;
@@ -489,52 +489,6 @@ export default function Home() {
             <Link href="/demo" className="btn-danger w-full text-center block mt-5">
               <RedCircleIcon size={10} className="inline-block align-text-bottom text-red-500" /> Revoke Consent (Burn NFT on NEAR)
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-4 sm:px-6 pb-16 sm:pb-24">
-        <div
-          className="max-w-2xl mx-auto glass-card p-12 md:p-16 text-center"
-          style={{ borderRadius: 32, position: "relative", overflow: "hidden" }}
-        >
-          <div
-            className="absolute inset-0 -z-10"
-            style={{
-              background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(37,99,235,0.1), rgba(6,182,212,0.08))",
-            }}
-          />
-          <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-5"
-            style={{
-              color: "#7c3aed",
-              background: "linear-gradient(135deg, rgba(124,58,237,0.08), rgba(37,99,235,0.08))",
-              border: "1px solid rgba(124,58,237,0.2)",
-            }}
-          >
-            <TrophyIcon size={14} className="inline-block align-text-bottom" /> Built at AI Agents Berlin Hackathon 2026
-          </div>
-          <h2 className="text-3xl md:text-5xl font-extrabold mb-4">
-            Give your agents
-            <br />
-            <span className="gradient-text">real memory</span>
-          </h2>
-          <p className="mb-9" style={{ color: "var(--text-secondary)" }}>
-            Join the waitlist for early access to UnifiedMemory --- the first platform that gives AI agents a complete, consent-controlled view of your digital life.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto px-4 sm:px-0">
-            <input
-              type="email"
-              placeholder="you@example.com"
-              className="flex-1 px-5 py-3 rounded-xl border outline-none transition-colors"
-              style={{
-                borderColor: "var(--border-strong)",
-                background: "var(--input-bg)",
-                color: "var(--text-primary)",
-              }}
-            />
-            <button className="btn-primary whitespace-nowrap">Get Early Access</button>
           </div>
         </div>
       </section>
