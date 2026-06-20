@@ -6,7 +6,7 @@
 # Gotcha baked in: rpc.testnet.near.org is dead. near-cli v4 reads the RPC
 # override from the env var NEAR_TESTNET_RPC — we force FastNEAR for every call.
 
-import os, re, json, subprocess
+import os, re, json, time, subprocess
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -53,19 +53,14 @@ def _run(args, timeout=90):
     return out
 
 
-def mint_demo_consent(agent_id=None):
-    """Mint a fresh, ephemeral consent token for one demo run. Returns token_id (str).
+def _parse_tx(out):
+    """Pull the transaction hash out of near-cli output (None if not present)."""
+    m = re.search(r"Transaction Id\s+([A-Za-z0-9]+)", out)
+    return m.group(1) if m else None
 
-    A new token id is required because revoke_consent is irreversible — reusing a
-    revoked token would fail every future rehearsal.
-    """
-    scope = dict(_DEMO_SCOPE)
-    if agent_id:
-        scope["agent_id"] = agent_id
-    out = _run([
-        "call", CONTRACT, "mint_consent", json.dumps(scope),
-        "--accountId", SIGNER, "--deposit", "0.1",
-    ])
+
+def _parse_token_id(out):
+    """Pull the minted token id out of near-cli output."""
     # Most reliable: the contract log `ConsentNFT minted: tokenId=N`.
     m = re.search(r"tokenId=(\d+)", out)
     if m:
@@ -76,6 +71,45 @@ def mint_demo_consent(agent_id=None):
     if m:
         return m.group(1)
     raise NearError(f"Could not parse token_id from mint output:\n...{out[-400:]}")
+
+
+def mint_consent(agent_id=None, allowed_platforms=None, allowed_memory_types=None,
+                 max_queries=None, max_usdc_budget=None, expires_days=None):
+    """Mint a Consent NFT with optional scope overrides (anything omitted falls
+    back to the full demo scope). Returns {token_id, tx_hash, explorer_url}.
+
+    This backs the REST /api/mint endpoint, so every field a frontend might send
+    is overridable; mint_demo_consent() is the zero-arg convenience wrapper.
+    """
+    scope = dict(_DEMO_SCOPE)
+    if agent_id:                     scope["agent_id"] = agent_id
+    if allowed_platforms:            scope["allowed_platforms"] = allowed_platforms
+    if allowed_memory_types:         scope["allowed_memory_types"] = allowed_memory_types
+    if max_queries is not None:      scope["max_queries"] = int(max_queries)
+    if max_usdc_budget is not None:  scope["max_usdc_budget"] = float(max_usdc_budget)
+    if expires_days is not None:
+        # Contract stores expires_at as a millisecond epoch (it multiplies by 1e6
+        # to compare against blockTimestamp in ns). See validate_query.
+        scope["expires_at"] = str(int((time.time() + float(expires_days) * 86400) * 1000))
+    out = _run([
+        "call", CONTRACT, "mint_consent", json.dumps(scope),
+        "--accountId", SIGNER, "--deposit", "0.1",
+    ])
+    tx = _parse_tx(out)
+    return {
+        "token_id": _parse_token_id(out),
+        "tx_hash": tx,
+        "explorer_url": f"{EXPLORER}/{tx}" if tx else None,
+    }
+
+
+def mint_demo_consent(agent_id=None):
+    """Mint a fresh, ephemeral consent token for one demo run. Returns token_id (str).
+
+    A new token id is required because revoke_consent is irreversible — reusing a
+    revoked token would fail every future rehearsal.
+    """
+    return mint_consent(agent_id=agent_id)["token_id"]
 
 
 def revoke_consent(token_id):
@@ -89,8 +123,7 @@ def revoke_consent(token_id):
         json.dumps({"token_id": str(token_id)}),
         "--accountId", SIGNER,
     ])
-    m = re.search(r"Transaction Id\s+([A-Za-z0-9]+)", out)
-    tx = m.group(1) if m else None
+    tx = _parse_tx(out)
     return tx, (f"{EXPLORER}/{tx}" if tx else None)
 
 

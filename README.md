@@ -35,6 +35,7 @@ The backend is **live and verified end-to-end** against real NEAR + Pinecone + O
 | x402 gate | 🟢 verified | 402 without `X-PAYMENT`, passes with it |
 | Consent gate | 🟢 verified | invalid/revoked token → `403 Access denied` |
 | Cloudflare Worker | 🟢 deployed | `unified-memory-mcp.rapid-king-4a64.workers.dev` (FastAPI fallback still available) |
+| Consent REST API | 🟢 verified | `POST /api/mint`, `POST /api/revoke/:id`, `GET /api/consent/:id` on FastAPI host — real on-chain mint→read→revoke (token `0` protected) |
 | Revocation demo | 🟢 live | real on-chain `revoke_consent` → tx hash → Scenario D blocked |
 
 End-to-end check (local FastAPI vs. live services): no-payment → `402`, with payment →

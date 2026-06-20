@@ -138,6 +138,9 @@ app.get('/.well-known/mcp', (c) => c.json({
   ]
 }));
 
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/health', (c) => c.json({ status: 'ok', service: 'UnifiedMemory MCP Worker' }));
+
 // ── recall_memory ─────────────────────────────────────────────────────────────
 app.post('/mcp/recall_memory', async (c) => {
   const { query, memory_type = 'all', platform = 'all', token_id } = await c.req.json();
