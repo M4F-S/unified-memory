@@ -60,11 +60,13 @@ Spotify, ChatGPT history, Apple Health — completely disconnected.
 
 ## Critical Path (Do These First, In Order)
 
-1. Deploy NEAR ConsentNFT contract (need contract address for everything else)
-2. Set up Pinecone index (need this for memory storage)
-3. Get Circle agent wallet funded with test USDC (need for x402 demo)
-4. Deploy MCP Worker (need URL for demo agent)
-5. Load 30 synthetic memories into Pinecone (needed for demo to work)
+1. ✅ Deploy NEAR ConsentNFT contract — DONE (`aihackathon.testnet`, token `0`)
+2. ✅ Set up Pinecone index — DONE (`unified-memory`, 1536-d cosine)
+3. ⚪ Get Circle agent wallet funded with test USDC (x402 demo; gate works with any `X-PAYMENT` header for now)
+4. ⚪ Deploy MCP Worker (FastAPI fallback works today; `wrangler deploy` outstanding)
+5. ✅ Load 30 synthetic memories into Pinecone — DONE (namespace `0`)
+
+**Backend is verified end-to-end** (NEAR consent + x402 + Pinecone + OpenRouter). See `AGENT.md`.
 
 ---
 
