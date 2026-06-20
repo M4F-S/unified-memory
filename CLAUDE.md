@@ -21,7 +21,8 @@ UnifiedMemory is a consent-controlled AI agent memory platform built for the AI 
 - `ingestion/connectors/__init__.py` — connector registry + lazy loader
 - `ingestion/run.py` — unified connector runner + CLI
 - `demo/agent.py` — demo agent with 4 scenarios + revocation
-- **175 tests passing**: 92 JS (Vitest) + 83 Python (pytest)
+- **182 tests passing**: 92 JS (Vitest) + 90 Python (pytest)
+- `workers/auth.py` — email/password auth (bcrypt + JWT) + Next.js login/register/auth-context (frontend)
 
 ### Status (updated June 20) — all four original blockers DONE
 1. ✅ NEAR ConsentNFT deployed — `aihackathon.testnet`, demo token `0`
@@ -86,6 +87,8 @@ uv run python demo/agent.py
 | `workers/x402-gate.js` | `checkPayment(req, url, env)` — returns `null` (ok) or 402 Response |
 | `workers/ingest.js` | `/ingest/connectors`, `/ingest/trigger`, `/ingest/trigger/batch`, `/ingest/status/:job_id` |
 | `workers/local_server.py` | FastAPI mirror of Worker. Run as fallback if Cloudflare fails |
+| `workers/auth.py` | Email/password auth — `/auth/register|login|me|users`, bcrypt + JWT, file-backed `data/users.json` (gitignored). Mounted on the FastAPI host only |
+| `app/lib/auth-context.tsx` | Next.js `AuthProvider` + `useAuth` — JWT in localStorage, revalidates via `/auth/me` |
 | `ingestion/synthesis.py` | `synthesize_batch(memories, user_id)`, `load_demo_memories(user_id)` |
 | `ingestion/connectors/__init__.py` | Connector registry — `CONNECTORS`, `get_connector(platform)`, `list_connectors()` (lazy SDK imports) |
 | `ingestion/run.py` | `run_connector(platform, user_id, source_path=...)` + CLI (`python -m ingestion.run`) |
@@ -109,6 +112,7 @@ All vars live in `.env` (copy from `.env.example`). Key ones:
 | `CIRCLE_WALLET_ADDRESS` | x402 payment target |
 | `MCP_URL` | Worker URL or `http://localhost:8000` for local |
 | `DEMO_CONSENT_TOKEN` | Token ID minted from NEAR contract — needed for demo agent |
+| `JWT_SECRET` | Signs `/auth/*` JWTs (FastAPI host). Use a long random string in prod |
 
 Worker secrets (set via `wrangler secret put`):
 - `OPENROUTER_API_KEY`, `PINECONE_API_KEY`, `CIRCLE_API_KEY`
@@ -195,6 +199,10 @@ Live contract: `aihackathon.testnet`, demo token `0`.
 | POST | `/api/mint` | local_server.py only | signer key |
 | POST | `/api/revoke/:token_id` | local_server.py only | signer key |
 | GET | `/api/consent/:token_id` | local_server.py only | none |
+| POST | `/auth/register` | auth.py (local_server only) | none |
+| POST | `/auth/login` | auth.py (local_server only) | none |
+| POST | `/auth/me` | auth.py (local_server only) | JWT bearer |
+| GET | `/auth/users` | auth.py (local_server only) | none (debug) |
 | GET | `/health` | mcp-server.js + local_server.py | none |
 
 Full request/response shapes are in `AGENT_BRIEF.md`.
