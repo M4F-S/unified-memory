@@ -12,21 +12,31 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# OpenRouter drop-in for OpenAI — just change base_url
-openrouter = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1",
-    default_headers={
-        "HTTP-Referer": "https://github.com/M4F-S/unified-memory",
-        "X-Title": "UnifiedMemory Hackathon"
-    }
-)
-
 CLASSIFY_MODEL = os.getenv("OPENROUTER_CLASSIFY_MODEL", "deepseek/deepseek-v3.2")
 EMBED_MODEL    = os.getenv("OPENROUTER_EMBED_MODEL",    "openai/text-embedding-3-small")
 
-pc    = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-index = pc.Index(os.getenv("PINECONE_INDEX_NAME", "unified-memory"))
+_openrouter = None
+_index = None
+
+def _get_openrouter():
+    global _openrouter
+    if _openrouter is None:
+        _openrouter = OpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+            default_headers={
+                "HTTP-Referer": "https://github.com/M4F-S/unified-memory",
+                "X-Title": "UnifiedMemory Hackathon"
+            }
+        )
+    return _openrouter
+
+def _get_index():
+    global _index
+    if _index is None:
+        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+        _index = pc.Index(os.getenv("PINECONE_INDEX_NAME", "unified-memory"))
+    return _index
 
 
 @dataclass
@@ -54,7 +64,7 @@ Importance: 8-10=life events/core skills/close relationships, 4-7=regular, 0-3=t
 
 
 def classify_memory(raw: RawMemory) -> dict:
-    resp = openrouter.chat.completions.create(
+    resp = _get_openrouter().chat.completions.create(
         model=CLASSIFY_MODEL,
         messages=[
             {"role": "system", "content": CLASSIFIER_PROMPT},
@@ -67,7 +77,7 @@ def classify_memory(raw: RawMemory) -> dict:
 
 
 def get_embedding(text: str) -> List[float]:
-    resp = openrouter.embeddings.create(model=EMBED_MODEL, input=text[:8000])
+    resp = _get_openrouter().embeddings.create(model=EMBED_MODEL, input=text[:8000])
     return resp.data[0].embedding
 
 
@@ -94,7 +104,7 @@ def synthesize_batch(memories: List[RawMemory], user_id: str, batch_size: int = 
                 }
             })
             if len(vectors) >= batch_size:
-                index.upsert(vectors=vectors, namespace=user_id)
+                _get_index().upsert(vectors=vectors, namespace=user_id)
                 total += len(vectors); vectors = []
                 print(f"  ✅ Upserted {total}...")
         except Exception as e:
