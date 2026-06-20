@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { recallMemory, revokeConsent, MOCK_RECALL_RESPONSE } from "@/lib/api";
+import { recallMemory, revokeConsent } from "@/lib/api";
 
 interface Memory {
   content: string;
@@ -36,7 +36,7 @@ export default function Demo() {
   const [revokeTx, setRevokeTx] = useState<string | null>(null);
   const [revokeError, setRevokeError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
-  const [tokenId, setTokenId] = useState("demo-token-001");
+  const [tokenId, setTokenId] = useState("0");
   const [backendLive, setBackendLive] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +104,7 @@ export default function Demo() {
 
     // Try real API, fallback to mock
     const apiResult = await recallMemory(query, tokenId);
-    const data = apiResult.ok && apiResult.data?.result ? apiResult.data : MOCK_RECALL_RESPONSE;
+    const data = apiResult.ok && apiResult.data?.result ? apiResult.data : { result: { memories: [], query_cost_usdc: 0.001, remaining_queries: 3 } };
 
     setRuns((prev) =>
       prev.map((r) =>
@@ -136,7 +136,7 @@ export default function Demo() {
         setRevoked(true);
         setRevokeTx(null);
       } else {
-        setRevokeError(res.data?.error?.message || "Revoke failed. Check backend status.");
+        setRevokeError((res.data as any)?.error?.message || "Revoke failed. Check backend status.");
       }
     } catch (e) {
       setRevokeError("Network error. Is the backend running?");
@@ -166,7 +166,7 @@ export default function Demo() {
           onChange={(e) => setTokenId(e.target.value)}
           className="w-full max-w-md px-4 py-2.5 rounded-xl border text-sm font-mono"
           style={{ background: "var(--input-bg)", borderColor: "var(--border-nav)", color: "var(--text-primary)" }}
-          placeholder="demo-token-001"
+          placeholder="0"
         />
       </div>
 

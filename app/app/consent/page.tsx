@@ -72,7 +72,7 @@ export default function Consent() {
       } else if (res.ok) {
         setMinted(true);
       } else {
-        setMintError(res.data?.error?.message || "Mint failed. Backend endpoint not ready.");
+        setMintError((res.data as any)?.error?.message || "Mint failed. Backend endpoint not ready.");
       }
     } catch (e) {
       setMintError("Network error. Is the backend running?");

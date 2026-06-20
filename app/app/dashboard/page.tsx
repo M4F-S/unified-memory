@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getMemoryStats, MOCK_MEMORY_STATS } from "@/lib/api";
+import { getMemoryStats } from "@/lib/api";
 
 interface QueryLog {
   id: number;
@@ -20,11 +20,11 @@ const DEMO_QUERIES: QueryLog[] = [
 ];
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(MOCK_MEMORY_STATS.result);
+  const [stats, setStats] = useState<any>({});
   const [live, setLive] = useState(false);
 
   useEffect(() => {
-    getMemoryStats("demo-token-001").then((r) => {
+    getMemoryStats("0").then((r) => {
       if (r.ok && r.data?.result) {
         setStats(r.data.result);
         setLive(true);

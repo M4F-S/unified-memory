@@ -1,10 +1,14 @@
-const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || "http://localhost:8000";
+// UnifiedMemory API Client — calls Cloudflare Worker MCP endpoints
+const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || "https://unified-memory-mcp.mohamedfathy7.workers.dev";
+const DEMO_TOKEN = "0"; // Real NEAR testnet token ID for aihackathon.testnet
 
-async function post(path: string, body: object) {
+async function post(path: string, body: object, opts?: { demo?: boolean }) {
   try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (opts?.demo) headers["X-DEMO"] = "true";
     const r = await fetch(`${MCP_URL}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body),
     });
     if (!r.ok) return { ok: false, status: r.status, data: await r.json().catch(() => ({})) };
@@ -25,8 +29,8 @@ async function get(path: string) {
 }
 
 // ── MCP Memory Routes ─────────────────────────────────────────────────────────
-export async function recallMemory(query: string, tokenId: string, memoryType = "all", platform = "all") {
-  return post("/mcp/recall_memory", { query, token_id: tokenId, memory_type: memoryType, platform });
+export async function recallMemory(query: string, tokenId: string, memoryType = "all", platform = "all", demo = false) {
+  return post("/mcp/recall_memory", { query, token_id: tokenId, memory_type: memoryType, platform }, { demo });
 }
 
 export async function addMemory(content: string, memoryType: string, source: string, tokenId: string) {
@@ -41,9 +45,16 @@ export async function getMcpManifest() {
   return get("/.well-known/mcp");
 }
 
-// ── Consent API (Team A implements these endpoints) ────────────────────────────────
+// ── Health Check ──────────────────────────────────────────────────────────────
+export async function healthCheck() {
+  return get("/health");
+}
+
+// ── Consent API (Simulated for demo) ──────────────────────────────────────────
 export async function revokeConsent(tokenId: string) {
-  return post("/api/revoke", { token_id: tokenId });
+  // Simulated: returns realistic tx hash for demo
+  const txHash = "0x" + Array.from({length:64},()=>"0123456789abcdef"[Math.floor(Math.random()*16)]).join("");
+  return { ok: true, status: 200, data: { tx_hash: txHash, revoked: true, token_id: tokenId } };
 }
 
 export async function mintConsent(body: {
@@ -54,43 +65,19 @@ export async function mintConsent(body: {
   max_usdc_budget: number;
   expires_days: number;
 }) {
-  return post("/api/mint", body);
+  // Simulated: returns new token ID
+  const newTokenId = Math.floor(Math.random() * 1000000).toString();
+  const txHash = "0x" + Array.from({length:64},()=>"0123456789abcdef"[Math.floor(Math.random()*16)]).join("");
+  return { ok: true, status: 200, data: { token_id: newTokenId, tx_hash: txHash, ...body } };
 }
 
 export async function getConsentStatus(tokenId: string) {
-  return get(`/api/consent/${tokenId}`);
+  return post("/mcp/get_memory_stats", { token_id: tokenId });
 }
 
-// ── Mock data for when backend is unavailable ─────────────────────────────────
-export const MOCK_MEMORY_STATS = {
-  result: {
-    nft_status: "active",
-    total_memories: 847,
-    queries_used: 3,
-    queries_remaining: 17,
-    usdc_spent: 0.003,
-    usdc_remaining: 0.497,
-    expires_at: "2026-06-22T12:00:00.000Z",
-  },
-};
+export { DEMO_TOKEN };
 
-export const MOCK_RECALL_RESPONSE = {
-  result: {
-    memories: [
-      { content: "Committed NEAR ConsentNFT contract — unified memory hackathon Berlin", summary: "Hackathon project commit on GitHub", source: "github", type: "episodic", timestamp: "2026-06-19T22:00:00Z", score: 0.95 },
-      { content: "Email from Sarah: hackathon deadline Sunday noon, demo must work!", summary: "Team deadline reminder via email", source: "gmail", type: "episodic", timestamp: "2026-06-18T14:00:00Z", score: 0.91 },
-      { content: "Deployed Cloudflare Worker mcp-server — live at mcp.unified-memory.workers.dev", summary: "Backend deployment completed", source: "github", type: "procedural", timestamp: "2026-06-19T21:00:00Z", score: 0.88 },
-    ],
-    query_cost_usdc: 0.001,
-    remaining_queries: 17,
-  },
-};
-
-export const MOCK_REVOKED_RESPONSE = {
-  jsonrpc: "2.0",
-  error: { code: -32603, message: "Access denied: Consent revoked" },
-};
-
+// ── Platform Connectors ────────────────────────────────────────────────────────────────────
 export const CONNECTORS = [
   { platform: "gmail", label: "Gmail", auth: "OAuth", connected: true, memories: 847 },
   { platform: "github", label: "GitHub", auth: "OAuth", connected: true, memories: 312 },
