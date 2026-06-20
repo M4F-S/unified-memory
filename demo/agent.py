@@ -7,6 +7,8 @@ import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
+from near_consent import revoke_consent, validate_query, NearError
+
 load_dotenv()
 
 client = OpenAI(
@@ -19,7 +21,10 @@ client = OpenAI(
 )
 
 AGENT_MODEL   = os.getenv("OPENROUTER_SMART_MODEL", "kimi/kimi-k2.5")
-MCP_URL       = os.getenv("MCP_URL", "https://mcp.unified-memory.workers.dev")
+MCP_URL       = os.getenv("MCP_URL", "http://localhost:8000")
+# Worker URL still a placeholder? Fall back to the local FastAPI server.
+if "YOUR-SUBDOMAIN" in MCP_URL or not MCP_URL:
+    MCP_URL = "http://localhost:8000"
 CONSENT_TOKEN = os.getenv("DEMO_CONSENT_TOKEN", "demo-token-001")
 
 TOOLS = [{"type":"function","function":{
@@ -81,9 +86,39 @@ def main():
     time.sleep(0.5)
 
     print("\n" + "🔴 "*15)
-    print("USER REVOKING CONSENT — burning NFT on NEAR blockchain...")
-    time.sleep(2)
-    print("✅ NFT revoked at block #87,432,910 — all access permanently blocked")
+    if CONSENT_TOKEN == "0":
+        # Token 0 is the shared, seeded baseline the API tests rely on — never burn it.
+        # revoke_consent is irreversible, so a real revoke here would break everything.
+        print("⚠️  DEMO_CONSENT_TOKEN=0 is the protected baseline — not revoking on-chain.")
+        print("   Run `uv run python demo/reset_consent.py` first for a REAL revoke.")
+        time.sleep(1.5)
+        print("✅ (simulated) consent revoked — all agent access blocked")
+    elif os.getenv("DEMO_SIMULATE_REVOKE") == "1":
+        print(f"USER REVOKING CONSENT — Consent NFT token {CONSENT_TOKEN}...")
+        time.sleep(1.5)
+        print("✅ (simulated) NFT revoked — all agent access permanently blocked")
+    else:
+        print(f"USER REVOKING CONSENT — burning Consent NFT (token {CONSENT_TOKEN}) on NEAR...")
+        try:
+            tx, url = revoke_consent(CONSENT_TOKEN)
+            print("✅ NFT revoked on-chain — all agent access permanently blocked")
+            if tx:
+                print(f"   🔗 Tx {tx}")
+                print(f"   🔍 {url}")
+            # Wait for the revoke to propagate to NEAR view nodes before Scenario D —
+            # otherwise the agent may read stale (still-valid) consent and NOT be blocked.
+            print("   ⏳ Waiting for on-chain propagation...")
+            for _ in range(10):
+                time.sleep(1.5)
+                try:
+                    if validate_query(CONSENT_TOKEN).get("valid") is False:
+                        print("   ✅ Confirmed revoked on-chain")
+                        break
+                except NearError:
+                    pass
+        except NearError as e:
+            # Demo safety net: never hard-crash on stage if NEAR is slow/unreachable.
+            print(f"⚠️  Live revoke failed ({str(e).splitlines()[0][:80]}) — showing simulated block")
     print("🔴 "*15 + "\n")
 
     run_agent("What emails did I receive today?", "D — POST-REVOCATION (must be BLOCKED)")

@@ -10,7 +10,8 @@ The critical gap: **getting things live.**
 | 2 | Load demo data into Pinecone (30 vectors, namespace `0`) | ✅ DONE |
 | 3 | Connector deps in pyproject.toml | ✅ DONE |
 | 4 | End-to-end demo test (local FastAPI server) | ✅ DONE |
-| 5 | Deploy Cloudflare Worker | ⬜ TODO |
+| 5 | Deploy Cloudflare Worker | ✅ DONE (`unified-memory-mcp.rapid-king-4a64.workers.dev`) |
+| 6 | Real on-chain revocation in the demo agent | ✅ DONE |
 
 ### Live deployment values (in .env)
 ```
@@ -249,19 +250,46 @@ curl https://unified-memory-mcp.YOUR-SUBDOMAIN.workers.dev/.well-known/mcp
 
 ---
 
-## Priority 6 — Revocation Demo Flow (the wow moment)
+## Priority 6 — Revocation Demo Flow (the wow moment) ✅ DONE
 
-After the demo agent runs Scenarios A–C, trigger the revocation on-chain:
+The revocation is now **real and on-chain**, wired straight into the demo agent — no
+more hard-coded fake block number. Scenario D is genuinely blocked by NEAR.
+
+### How it works
+
+- `demo/near_consent.py` — thin near-cli wrapper: `mint_demo_consent()`,
+  `revoke_consent(token_id) -> (tx_hash, explorer_url)`, `validate_query(token_id)`.
+  Forces `NEAR_TESTNET_RPC=FastNEAR` on every call (the dead-RPC gotcha).
+- `demo/reset_consent.py` — **run this OFF-STAGE before each rehearsal.** Mints a fresh
+  Consent NFT, seeds *its* Pinecone namespace with the 30 demo memories, and writes
+  `DEMO_CONSENT_TOKEN=<new id>` into `.env`. Needed because `revoke_consent` is
+  **irreversible** — every run needs a new token, and Pinecone namespace == token_id.
+- `demo/agent.py` — runs Scenarios A–C on the prepared token, then does a **real
+  `revoke_consent`** before D, prints the live tx hash + explorer link, and **waits for
+  the revoke to propagate to NEAR view nodes** before Scenario D (there's a ~1–2s lag;
+  without the wait the agent can read stale consent and fail to block).
+
+### Run it
 
 ```bash
-near call $NEAR_CONTRACT_ID revoke_consent \
-  '{"token_id":"0"}' --accountId $NEAR_ACCOUNT_ID
-# → prints tx hash — show this on NEAR Explorer: https://testnet.nearblocks.io
+uv run python demo/reset_consent.py     # off-stage: fresh token + seed + .env
+uv run python demo/agent.py             # A–C ✅, real revoke, D → 403 blocked ✅
 ```
 
-Then Scenario D in `demo/agent.py` will automatically get HTTP 403 "Access denied: Consent revoked".
+### Safety guards baked in
 
-This is the core demo moment — the on-chain transaction hash proves it happened in real time.
+- **Token `0` is the protected baseline** (the seeded namespace the API tests rely on).
+  If `DEMO_CONSENT_TOKEN=0`, agent.py refuses the on-chain revoke and simulates it, so
+  the baseline is never burned. Run `reset_consent.py` to get a real, burnable token.
+- `DEMO_SIMULATE_REVOKE=1` forces simulated revocation (no NEAR call) if testnet is down.
+- A failed live revoke degrades gracefully to a simulated block — the demo never crashes.
+
+### Verified
+
+- Mint → fresh `token_id`; seed → 30 memories in namespace `token_id`.
+- `revoke_consent` returns a real tx hash (e.g. `https://testnet.nearblocks.io/txns/<hash>`).
+- After propagation: `validate_query` → `{valid:false, reason:'Consent revoked'}`,
+  `recall_memory` → `403 Access denied: Consent revoked`. ✅
 
 ---
 

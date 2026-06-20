@@ -34,7 +34,8 @@ The backend is **live and verified end-to-end** against real NEAR + Pinecone + O
 | MCP API | 🟢 verified | `recall_memory` / `add_memory` / `get_memory_stats` working |
 | x402 gate | 🟢 verified | 402 without `X-PAYMENT`, passes with it |
 | Consent gate | 🟢 verified | invalid/revoked token → `403 Access denied` |
-| Cloudflare Worker | ⚪ pending | runs locally via FastAPI fallback; `wrangler deploy` outstanding |
+| Cloudflare Worker | 🟢 deployed | `unified-memory-mcp.rapid-king-4a64.workers.dev` (FastAPI fallback still available) |
+| Revocation demo | 🟢 live | real on-chain `revoke_consent` → tx hash → Scenario D blocked |
 
 End-to-end check (local FastAPI vs. live services): no-payment → `402`, with payment →
 5 memories returned + `remaining_queries` decrements, invalid token → `403`.
