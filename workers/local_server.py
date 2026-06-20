@@ -33,6 +33,15 @@ PROTECTED_TOKENS = {"0"}
 
 app = FastAPI(title="UnifiedMemory MCP Server (local fallback)")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# Email/password auth (bcrypt + JWT) for the demo frontend. Guarded so a missing
+# auth dep never takes down the MCP surface or the existing test suite.
+try:
+    from workers.auth import router as auth_router
+    app.include_router(auth_router)
+except Exception as _auth_err:
+    import logging
+    logging.warning(f"Auth router not loaded: {_auth_err}")
+
 
 NEAR_RPC         = os.getenv("NEAR_RPC", "https://rpc.testnet.near.org")
 NEAR_CONTRACT_ID = os.getenv("NEAR_CONTRACT_ID", "consent-nft.testnet")

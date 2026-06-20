@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 const links = [
   { href: "/", label: "Home" },
@@ -12,8 +13,16 @@ const links = [
 
 export default function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading, logout } = useAuth();
   const [, setTheme] = useState<"light" | "dark">("dark");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  function handleLogout() {
+    logout();
+    setMobileOpen(false);
+    router.replace("/");
+  }
 
   useEffect(() => {
     const stored = localStorage.getItem("um-theme");
@@ -69,9 +78,20 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          <Link href="/login" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
-            Login
-          </Link>
+          {!loading && (
+            user ? (
+              <div className="hidden md:flex items-center gap-4">
+                <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{user.email}</span>
+                <button onClick={handleLogout} className="btn-primary text-sm px-5 py-2.5">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
+                Login
+              </Link>
+            )
+          )}
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -118,13 +138,24 @@ export default function Nav() {
               </Link>
             ))}
             <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border-nav)" }}>
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="btn-primary text-sm px-5 py-2.5 w-full text-center block"
-              >
-                Login
-              </Link>
+              {!loading && (
+                user ? (
+                  <>
+                    <div className="px-4 py-2 text-sm mb-2" style={{ color: "var(--text-secondary)" }}>{user.email}</div>
+                    <button onClick={handleLogout} className="btn-primary text-sm px-5 py-2.5 w-full text-center block">
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="btn-primary text-sm px-5 py-2.5 w-full text-center block"
+                  >
+                    Login
+                  </Link>
+                )
+              )}
             </div>
           </div>
         </>
