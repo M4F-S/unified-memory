@@ -7,9 +7,9 @@ The critical gap: **getting things live.**
 | # | Task | Status |
 |---|------|--------|
 | 1 | NEAR ConsentNFT contract deployed + token minted | ✅ DONE |
-| 2 | Load demo data into Pinecone | ⬜ TODO (needs API keys) |
+| 2 | Load demo data into Pinecone (30 vectors, namespace `0`) | ✅ DONE |
 | 3 | Connector deps in pyproject.toml | ✅ DONE |
-| 4 | End-to-end demo test | ⬜ TODO |
+| 4 | End-to-end demo test (local FastAPI server) | ✅ DONE |
 | 5 | Deploy Cloudflare Worker | ⬜ TODO |
 
 ### Live deployment values (in .env)
@@ -17,8 +17,23 @@ The critical gap: **getting things live.**
 NEAR_CONTRACT_ID=aihackathon.testnet
 DEMO_CONSENT_TOKEN=0
 NEAR_RPC=https://rpc.testnet.fastnear.com
+PINECONE_INDEX_NAME=unified-memory   # dim 1536, cosine, serverless aws us-east-1
+PINECONE_HOST=unified-memory-rsv5o69.svc.aped-4627-b74a.pinecone.io
 ```
 Contract owner/signer: `aihackathon.testnet`. Verified: `validate_query` returns `{valid:true, remaining_queries:100}`.
+
+### End-to-end verified (local FastAPI vs. live NEAR + Pinecone + OpenRouter)
+- `recall_memory` no payment → `402` ✅
+- `recall_memory` + `X-PAYMENT` → 5 memories from namespace `0`, `remaining_queries` decrements ✅
+- `get_memory_stats` → `active`, 30 memories ✅
+- invalid token → `403 Access denied: Token not found` ✅
+
+### Namespace model (important)
+Pinecone namespace = `token_id` everywhere (read, write, stats). Demo data lives in
+namespace `0` (= `DEMO_CONSENT_TOKEN`). The original code had a bug: `recall_memory`
+queried the default namespace instead of `token_id` — fixed in `mcp-server.js` and
+`local_server.py`. To re-seed: `uv run python -c "from ingestion.synthesis import
+load_demo_memories; load_demo_memories('0')"`.
 
 ---
 

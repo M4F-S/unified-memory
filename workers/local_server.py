@@ -82,12 +82,12 @@ async def classify_memory(content: str, source: str) -> dict:
 
 # ── Pinecone helpers ───────────────────────────────────────────────────────────
 
-async def pinecone_query(embedding: list, filter: dict, top_k: int = 5) -> list:
+async def pinecone_query(embedding: list, filter: dict, top_k: int = 5, namespace: str = "") -> list:
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(
             f"https://{PINECONE_HOST}/query",
             headers=PINECONE_HEADERS,
-            json={"vector": embedding, "filter": filter, "topK": top_k, "includeMetadata": True}
+            json={"vector": embedding, "filter": filter, "topK": top_k, "namespace": namespace, "includeMetadata": True}
         )
     return resp.json().get("matches", [])
 
@@ -202,7 +202,7 @@ async def recall_memory(request: Request):
     if memory_type != "all": filter_["memory_type"] = {"$eq": memory_type}
     if platform    != "all": filter_["platform"]     = {"$eq": platform}
 
-    matches = await pinecone_query(embedding, filter_)
+    matches = await pinecone_query(embedding, filter_, namespace=token_id)
 
     return {
         "jsonrpc": "2.0",
