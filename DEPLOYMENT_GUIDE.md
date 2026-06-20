@@ -237,13 +237,17 @@ synthesize_batch(memories, 'real-user')
 ## CHECKLIST — Platform Is Live When All Are ✅
 
 - [x] `NEAR ConsentNFT` deployed and callable on testnet (`aihackathon.testnet`)
-- [ ] `MCP Worker` live at workers.dev URL — test: `curl https://YOUR-WORKER.workers.dev/.well-known/mcp`
+- [x] `MCP Worker` live at `unified-memory-mcp.rapid-king-4a64.workers.dev`
 - [x] `Pinecone index` has 30 memories loaded (namespace `0`)
 - [x] MCP flow verified via local FastAPI: 402 / memories / 403
-- [ ] `uv run python demo/agent.py` runs all 4 scenarios without errors
-- [ ] `Revocation scenario` blocks the agent and shows reason (needs live `revoke_consent` call)
+- [ ] `uv run python demo/agent.py` runs all 4 scenarios without errors (LLM run)
+- [x] `Revocation scenario` blocks the agent with a real on-chain `revoke_consent` (tx hash + 403 verified)
 - [ ] `Frontend` live on Vercel with connect buttons working
 - [x] `Demo consent token` minted (`0`) and saved in .env
+
+> **Repeatable demo:** run `uv run python demo/reset_consent.py` before each rehearsal —
+> it mints a fresh token, seeds its namespace, and updates `DEMO_CONSENT_TOKEN`. Token `0`
+> is the protected baseline and is never revoked by the agent.
 
 ---
 
