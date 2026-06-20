@@ -74,67 +74,67 @@ export default function Home() {
       {/* Aurora background */}
       <div
         className="fixed inset-0 -z-10 overflow-hidden"
-        style={{ background: "var(--aurora-base)" }}
+        style={{ background: "var(--aurora-base)", transform: "translateZ(0)" }}
       >
         <div
-          className="absolute rounded-full blur-[80px] animate-orb-float"
+          className="absolute rounded-full blur-[60px] sm:blur-[80px] animate-orb-float"
           style={{
-            width: 700,
-            height: 700,
+            width: "clamp(300px, 50vw, 700px)",
+            height: "clamp(300px, 50vw, 700px)",
             background: "radial-gradient(circle, #c4b5fd, transparent 70%)",
-            top: -200,
-            left: -150,
+            top: "-10%",
+            left: "-10%",
             animationDuration: "20s",
             opacity: "var(--orb-opacity)",
           }}
         />
         <div
-          className="absolute rounded-full blur-[80px] animate-orb-float"
+          className="absolute rounded-full blur-[60px] sm:blur-[80px] animate-orb-float"
           style={{
-            width: 500,
-            height: 500,
+            width: "clamp(250px, 40vw, 500px)",
+            height: "clamp(250px, 40vw, 500px)",
             background: "radial-gradient(circle, #bae6fd, transparent 70%)",
             top: "10%",
-            right: -100,
+            right: "-10%",
             animationDuration: "25s",
             animationDelay: "-5s",
             opacity: "var(--orb-opacity)",
           }}
         />
         <div
-          className="absolute rounded-full blur-[80px] animate-orb-float"
+          className="absolute rounded-full blur-[60px] sm:blur-[80px] animate-orb-float"
           style={{
-            width: 600,
-            height: 600,
+            width: "clamp(280px, 45vw, 600px)",
+            height: "clamp(280px, 45vw, 600px)",
             background: "radial-gradient(circle, #f5d0fe, transparent 70%)",
-            bottom: -100,
-            left: "20%",
+            bottom: "-5%",
+            left: "15%",
             animationDuration: "22s",
             animationDelay: "-8s",
             opacity: "var(--orb-opacity)",
           }}
         />
         <div
-          className="absolute rounded-full blur-[80px] animate-orb-float"
+          className="absolute rounded-full blur-[60px] sm:blur-[80px] animate-orb-float"
           style={{
-            width: 400,
-            height: 400,
+            width: "clamp(200px, 30vw, 400px)",
+            height: "clamp(200px, 30vw, 400px)",
             background: "radial-gradient(circle, #a5f3fc, transparent 70%)",
-            bottom: "15%",
-            right: "10%",
+            bottom: "10%",
+            right: "5%",
             animationDuration: "28s",
             animationDelay: "-12s",
             opacity: "var(--orb-opacity)",
           }}
         />
         <div
-          className="absolute rounded-full blur-[80px] animate-orb-float"
+          className="absolute rounded-full blur-[60px] sm:blur-[80px] animate-orb-float"
           style={{
-            width: 350,
-            height: 350,
+            width: "clamp(180px, 25vw, 350px)",
+            height: "clamp(180px, 25vw, 350px)",
             background: "radial-gradient(circle, #ddd6fe, transparent 70%)",
-            top: "40%",
-            left: "35%",
+            top: "45%",
+            left: "30%",
             animationDuration: "16s",
             animationDelay: "-3s",
             opacity: "var(--orb-opacity)",
@@ -142,12 +142,12 @@ export default function Home() {
         />
       </div>
 
-      {/* SVG Strands */}
+      {/* SVG Strands - static decorative lines, no animation to prevent jank */}
       <svg
         className="fixed inset-0 -z-[5] pointer-events-none"
         viewBox="0 0 1900 1000"
         preserveAspectRatio="xMidYMid slice"
-        style={{ opacity: "var(--strand-opacity)" }}
+        style={{ opacity: "var(--strand-opacity)", transform: "translateZ(0)" }}
       >
         <defs>
           <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -167,7 +167,6 @@ export default function Home() {
           </linearGradient>
         </defs>
         <path
-          className="strand-path s1"
           d="M-50,200 Q300,80 600,300 Q900,520 1300,250 Q1600,100 1900,350"
           fill="none"
           stroke="url(#g1)"
@@ -175,7 +174,6 @@ export default function Home() {
           strokeLinecap="round"
         />
         <path
-          className="strand-path s2"
           d="M-50,500 Q250,350 550,550 Q850,750 1150,480 Q1450,210 1900,600"
           fill="none"
           stroke="url(#g2)"
@@ -183,7 +181,6 @@ export default function Home() {
           strokeLinecap="round"
         />
         <path
-          className="strand-path s3"
           d="M-50,750 Q400,600 700,800 Q1000,1000 1300,700 Q1600,400 1900,800"
           fill="none"
           stroke="url(#g3)"
@@ -193,7 +190,7 @@ export default function Home() {
       </svg>
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-20">
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:pb-20">
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-4 animate-fade-up"
           style={{
@@ -217,13 +214,13 @@ export default function Home() {
           <span className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] animate-badge-pulse" />
           Now in Beta \u00B7 20+ Platforms Connected
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6 animate-fade-up" style={{ animationDelay: "0.2s" }}>
           Your entire digital life.
           <br />
           <span className="gradient-text">One unified memory.</span>
         </h1>
         <p
-          className="text-lg md:text-xl max-w-2xl leading-relaxed mb-11 animate-fade-up"
+          className="text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-11 animate-fade-up px-2 sm:px-0"
           style={{ color: "var(--text-secondary)", animationDelay: "0.35s" }}
         >
           UnifiedMemory collects your data from every platform \u2014 Gmail, GitHub, ChatGPT, Spotify, Instagram and 15+ more \u2014 and gives your AI agents secure, consent-controlled access via a single MCP endpoint.
@@ -317,7 +314,7 @@ export default function Home() {
       </section>
 
       {/* Logo Loop */}
-      <section className="pb-20">
+      <section className="pb-12 sm:pb-20">
         <p className="text-center text-xs font-medium tracking-widest uppercase mb-5" style={{ color: "var(--text-muted)" }}>
           Connecting your entire digital universe
         </p>
@@ -334,7 +331,7 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-6">
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <span className="block text-center text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#7c3aed" }}>
             How It Works
@@ -371,7 +368,7 @@ export default function Home() {
       </section>
 
       {/* Memory Types */}
-      <section className="py-0 px-6 pb-24 text-center">
+      <section className="py-0 px-4 sm:px-6 pb-16 sm:pb-24 text-center">
         <div className="max-w-4xl mx-auto">
           <span className="block text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#7c3aed" }}>
             Memory Architecture
@@ -403,7 +400,7 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="px-6 pb-24">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-6">
           {[
             { n: "20+", l: "Platform Connectors" },
@@ -423,7 +420,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="px-6 pb-24">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24">
         <div className="max-w-5xl mx-auto">
           <span className="block text-center text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#7c3aed" }}>
             Key Features
@@ -461,7 +458,7 @@ export default function Home() {
       </section>
 
       {/* Consent NFT Demo */}
-      <section className="px-6 pb-24 text-center">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24 text-center">
         <div className="max-w-3xl mx-auto">
           <span className="block text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#7c3aed" }}>
             Live Demo
@@ -513,7 +510,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 pb-24">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24">
         <div
           className="max-w-2xl mx-auto glass-card p-12 md:p-16 text-center"
           style={{ borderRadius: 32, position: "relative", overflow: "hidden" }}
@@ -542,7 +539,7 @@ export default function Home() {
           <p className="mb-9" style={{ color: "var(--text-secondary)" }}>
             Join the waitlist for early access to UnifiedMemory \u2014 the first platform that gives AI agents a complete, consent-controlled view of your digital life.
           </p>
-          <div className="flex gap-2.5 max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto px-4 sm:px-0">
             <input
               type="email"
               placeholder="you@example.com"
@@ -560,7 +557,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        className="px-6 md:px-12 py-9 border-t flex flex-col md:flex-row items-center justify-between gap-3"
+        className="px-4 sm:px-6 md:px-12 py-6 sm:py-9 border-t flex flex-col md:flex-row items-center justify-between gap-3"
         style={{ background: "var(--footer-bg)", backdropFilter: "blur(12px)", borderColor: "var(--border-nav)" }}
       >
         <span className="font-bold text-lg gradient-text"><BrainIcon size={18} className="inline-block align-text-bottom" /> UnifiedMemory</span>

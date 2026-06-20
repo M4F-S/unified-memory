@@ -88,16 +88,27 @@ html, body {
   100% { background-position: 0% 50%; }
 }
 
-/* Aurora orbs */
+/* Aurora orbs - GPU accelerated */
 @keyframes orbFloat {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  25% { transform: translate(30px,-40px) scale(1.05); }
-  50% { transform: translate(-20px,30px) scale(0.97); }
-  75% { transform: translate(40px,20px) scale(1.03); }
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  25% { transform: translate3d(30px,-40px,0) scale(1.05); }
+  50% { transform: translate3d(-20px,30px,0) scale(0.97); }
+  75% { transform: translate3d(40px,20px,0) scale(1.03); }
 }
 
 .animate-orb-float {
   animation: orbFloat 18s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Mobile orb sizing */
+@media (max-width: 640px) {
+  .animate-orb-float {
+    animation-duration: 24s !important;
+    opacity: calc(var(--orb-opacity) * 0.6) !important;
+  }
 }
 
 /* Glass card */
@@ -106,6 +117,7 @@ html, body {
   border: 1px solid var(--border);
   border-radius: 20px;
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -127,6 +139,7 @@ html, body {
   border-radius: 19px;
   background: var(--card-after);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 0;
 }
 .glass-card:hover::before { opacity: 1; }
@@ -143,6 +156,7 @@ html, body {
   border-radius: 20px;
   padding: 32px 28px;
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -164,6 +178,7 @@ html, body {
   border-radius: 19px;
   background: var(--card-after);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 0;
 }
 .feature-card:hover::before { opacity: 1; }
@@ -201,10 +216,10 @@ html, body {
   background: rgba(239,68,68,0.25);
 }
 
-/* Logo loop */
+/* Logo loop - GPU accelerated */
 @keyframes logoScroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(-50%,0,0); }
 }
 
 .logo-loop-inner {
@@ -212,6 +227,7 @@ html, body {
   gap: 12px;
   width: max-content;
   animation: logoScroll 30s linear infinite;
+  will-change: transform;
 }
 .logo-loop-inner:hover {
   animation-play-state: paused;
@@ -231,11 +247,20 @@ html, body {
   color: var(--text-secondary);
   white-space: nowrap;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all 0.2s;
 }
 .platform-pill:hover {
   background: var(--surface-solid);
   border-color: rgba(124,58,237,0.3);
+}
+
+/* Mobile platform pills */
+@media (max-width: 640px) {
+  .platform-pill {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
 }
 
 /* Blur reveal */
@@ -293,6 +318,39 @@ html, body {
 }
 .animate-nft-pulse {
   animation: nftPulse 2s infinite;
+}
+
+/* Mobile typography */
+@media (max-width: 640px) {
+  .hero-title-mobile {
+    font-size: 2.5rem !important;
+    line-height: 1.15 !important;
+  }
+  .hero-sub-mobile {
+    font-size: 1rem !important;
+  }
+  .section-title-mobile {
+    font-size: 2rem !important;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-orb-float,
+  .logo-loop-inner,
+  .animate-badge-pulse,
+  .animate-nft-pulse,
+  .animate-fade-up,
+  .animate-node-appear,
+  .animate-bar-grow,
+  .gradient-text {
+    animation: none !important;
+  }
+  .blur-reveal {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
 }
 
 /* Scrollbar */
