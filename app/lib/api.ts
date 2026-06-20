@@ -1,5 +1,5 @@
 // UnifiedMemory API Client — calls Cloudflare Worker MCP endpoints
-const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || "https://unified-memory-mcp.mohamedfathy7.workers.dev";
+const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || "https://unified-memory-mcp.rapid-king-4a64.workers.dev";
 const DEMO_TOKEN = "0"; // Real NEAR testnet token ID for aihackathon.testnet
 
 async function post(path: string, body: object, opts?: { demo?: boolean }) {
