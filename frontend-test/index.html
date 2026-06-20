@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="color-scheme" content="light dark" />
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <title>UnifiedMemory — Your Digital Memory OS</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,12 +33,6 @@
       --toggle-hover: rgba(124,58,237,0.18);
       --toggle-border: rgba(124,58,237,0.25);
       --toggle-color: #7c3aed;
-      --ribbon-bg: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(37,99,235,0.08));
-      --ribbon-border: rgba(124,58,237,0.2);
-      --ribbon-color: #7c3aed;
-      --badge-bg: rgba(124,58,237,0.08);
-      --badge-border: rgba(124,58,237,0.2);
-      --badge-color: #7c3aed;
     }
     html.dark {
       --bg: #0d0a1a;
@@ -69,12 +60,6 @@
       --toggle-hover: rgba(124,58,237,0.24);
       --toggle-border: rgba(124,58,237,0.30);
       --toggle-color: #a78bfa;
-      --ribbon-bg: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(37,99,235,0.12));
-      --ribbon-border: rgba(124,58,237,0.35);
-      --ribbon-color: #c4b5fd;
-      --badge-bg: rgba(124,58,237,0.14);
-      --badge-border: rgba(124,58,237,0.30);
-      --badge-color: #c4b5fd;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -89,15 +74,6 @@
     .aurora-bg {
       position: fixed; inset: 0; z-index: 0; overflow: hidden;
       background: var(--aurora-base);
-    }
-    .aurora-art {
-      position: absolute; inset: 0;
-      background: url('assets/hero-memory-graph.png') center 30% / min(1200px, 95vw) auto no-repeat;
-      opacity: 0.28; pointer-events: none;
-      mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 92%);
-    }
-    html.dark .aurora-art {
-      display: none;
     }
     .aurora-orb {
       position: absolute; border-radius: 50%;
@@ -186,15 +162,15 @@
       text-align: center; padding: 120px 24px 80px;
     }
     .hackathon-ribbon {
-      display: inline-flex; align-items: center; gap: 8px; background: var(--ribbon-bg);
-      border: 1px solid var(--ribbon-border); border-radius: 100px; padding: 6px 16px; font-size: 0.78rem; font-weight: 600; color: var(--ribbon-color);
+      display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(37,99,235,0.08));
+      border: 1px solid rgba(124,58,237,0.2); border-radius: 100px; padding: 6px 16px; font-size: 0.78rem; font-weight: 600; color: #7c3aed;
       margin-bottom: 16px; animation: fadeUp 0.8s 0.05s ease both;
     }
     .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px; background: var(--badge-bg); border: 1px solid var(--badge-border);
-      border-radius: 100px; padding: 6px 16px; font-size: 0.82rem; font-weight: 600; color: var(--badge-color); margin-bottom: 28px; animation: fadeUp 0.8s 0.1s ease both;
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 100px; padding: 6px 16px; font-size: 0.82rem; font-weight: 600; color: #7c3aed; margin-bottom: 28px; animation: fadeUp 0.8s 0.1s ease both;
     }
-    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--badge-color); animation: badgePulse 2s ease-in-out infinite; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7c3aed; animation: badgePulse 2s ease-in-out infinite; }
     @keyframes badgePulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
     .hero-title {
       font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 24px; animation: fadeUp 0.8s 0.2s ease both;
@@ -423,7 +399,7 @@
       <button class="theme-toggle" id="themeToggle" title="Toggle color mode" aria-label="Toggle dark mode">
         <span id="themeIcon">🌙</span>
       </button>
-      <button class="nav-cta" onclick="location.href='onboard.html'">Connect Platforms</button>
+      <button class="nav-cta">Get Early Access</button>
     </div>
   </nav>
   <section class="hero">
@@ -470,7 +446,7 @@
       <h2 class="section-title">Five steps to <span class="gradient-text">total memory</span></h2>
       <p class="section-sub">Connect once. Synthesize everything. Give your agents exactly the context they need — with you in control.</p>
       <div class="steps-grid">
-        <div class="glow-card blur-reveal"><div class="step-number">1</div><div class="step-title">Connect Platforms</div><div class="step-desc">One-click OAuth for Gmail, GitHub, Spotify. Or drop your export file - no terminal, no file paths.</div></div>
+        <div class="glow-card blur-reveal"><div class="step-number">1</div><div class="step-title">Connect Platforms</div><div class="step-desc">Authorize via OAuth or upload your GDPR data export. We support 20+ platforms and automatically file DSAR requests on your behalf.</div></div>
         <div class="glow-card blur-reveal"><div class="step-number">2</div><div class="step-title">Synthesize Memory</div><div class="step-desc">GPT-4o classifies every data point into 5 memory types, generates embeddings, and stores them in a searchable vector graph.</div></div>
         <div class="glow-card blur-reveal"><div class="step-number">3</div><div class="step-title">Mint Consent NFT</div><div class="step-desc">Define exactly what your agent can access: platforms, memory types, query budget, and expiry. Minted on NEAR blockchain — immutable proof.</div></div>
         <div class="glow-card blur-reveal"><div class="step-number">4</div><div class="step-title">Agent Queries MCP</div><div class="step-desc">Any AI agent — ChatGPT, Claude, or your own — queries your memory via our MCP endpoint. Each query costs 0.001 USDC via Circle x402.</div></div>
@@ -552,22 +528,56 @@
     <span class="footer-text">GDPR Compliant · NEAR · Circle · Cloudflare MCP</span>
   </footer>
 </div>
-<script src="theme.js"></script>
 <script>
+  const html = document.documentElement;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const toggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+
+  function getStoredTheme() {
+    return localStorage.getItem('um-theme');
+  }
+  function getEffectiveTheme() {
+    const stored = getStoredTheme();
+    return stored || (prefersDark.matches ? 'dark' : 'light');
+  }
+  function applyTheme(theme) {
+    html.classList.remove('light', 'dark');
+    html.classList.add(theme);
+    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    toggleBtn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    toggleBtn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+  }
+  applyTheme(getEffectiveTheme());
+  window.addEventListener('load', () => document.body.classList.add('theme-ready'));
+  toggleBtn.addEventListener('click', () => {
+    const next = html.classList.contains('dark') ? 'light' : 'dark';
+    localStorage.setItem('um-theme', next);
+    applyTheme(next);
+  });
+  prefersDark.addEventListener('change', (e) => {
+    if (!getStoredTheme()) applyTheme(e.matches ? 'dark' : 'light');
+  });
+  toggleBtn.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('um-theme');
+    applyTheme(prefersDark.matches ? 'dark' : 'light');
+  });
+
   const platforms = [
     {icon:'📧',name:'Gmail'},{icon:'🐙',name:'GitHub'},{icon:'🤖',name:'ChatGPT'},
     {icon:'🟠',name:'Claude'},{icon:'🎵',name:'Spotify'},{icon:'💬',name:'WhatsApp'},
     {icon:'📸',name:'Instagram'},{icon:'🐦',name:'Twitter/X'},{icon:'💼',name:'LinkedIn'},
     {icon:'📓',name:'Notion'},{icon:'💼',name:'Slack'},{icon:'🎮',name:'Discord'},
     {icon:'✈️',name:'Telegram'},{icon:'👥',name:'Facebook'},{icon:'🎵',name:'TikTok'},
-    {icon:'▶️',name:'YouTube'},{icon:'❤️',name:'Apple Health'},{icon:'🤙',name:'Reddit'},
+    {icon:'▶️',name:'YouTube'},{icon:'❤️',name:'Apple Health'},{icon:'🤚',name:'Reddit'},
     {icon:'🏃',name:'Google Fit'},{icon:'✉️',name:'Apple Mail'}
   ];
   const loop = document.getElementById('logoLoop');
   [...platforms, ...platforms].forEach(p => {
     const el = document.createElement('div');
     el.className = 'platform-pill';
-    el.innerHTML = `<span>${p.icon}</span>${p.name}`;
+    el.innerHTML = '<span>'+p.icon+'</span>'+p.name;
     loop.appendChild(el);
   });
 
@@ -582,7 +592,6 @@
       card.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
   });
-
   const observer = new IntersectionObserver(entries => {
     entries.forEach((e, i) => {
       if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i*80);

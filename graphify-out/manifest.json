@@ -1,0 +1,222 @@
+{
+  ".sync_checkpoint.json": {
+    "mtime": 1781920448.992898,
+    "ast_hash": "146d95468a6738319dbf650bca607b46",
+    "semantic_hash": ""
+  },
+  "000-Index.md": {
+    "mtime": 1781920431.556863,
+    "ast_hash": "0e5be8fc3d606b38df5f86473ec58d7c",
+    "semantic_hash": ""
+  },
+  "Extracted/2026-06-09--facts.md": {
+    "mtime": 1781070722.9392428,
+    "ast_hash": "3ba15c1e5f2ce5504300c222356c5aea",
+    "semantic_hash": ""
+  },
+  "Extracted/2026-06-10--facts.md": {
+    "mtime": 1781136964.6037662,
+    "ast_hash": "22649f4bbb8e732ff8cfb5e47fdc294b",
+    "semantic_hash": ""
+  },
+  "Extracted/2026-06-11--facts.md": {
+    "mtime": 1781224869.1871283,
+    "ast_hash": "eba117b1e76a18f4dc5250df84edd1a8",
+    "semantic_hash": ""
+  },
+  "Extracted/2026-06-12--facts.md": {
+    "mtime": 1781269239.3085566,
+    "ast_hash": "348baeab116dfe9ef7c2e9bb8aeb2c12",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-04--1919--friendly-german-greeting-exchange.md": {
+    "mtime": 1781048499.0678504,
+    "ast_hash": "c7f8d2eefab2595278ffba994cc54585",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-05--1018--graphifyy-installed-but-docker-sandbox-down.md": {
+    "mtime": 1781048472.4528024,
+    "ast_hash": "dc7cd6345b57b0539dd374d9a9c9cb50",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-05--2147--graphify-obsidian-vault-blocked-by-llm-keys.md": {
+    "mtime": 1781048434.976735,
+    "ast_hash": "ce3ae33c2731ffaa730deb929f472dc6",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-06--2022--evaluating-agentpay-for-algorand-hackathon.md": {
+    "mtime": 1781048396.7506666,
+    "ast_hash": "aa84991407792f4d533a030e72221664",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-08--0604--why-i-forget-previous-conversations.md": {
+    "mtime": 1781048346.0565755,
+    "ast_hash": "833d9c5df81e6ce682cce6c51073503f",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-09--0559--delete-project-memory-keep-learned-lessons.md": {
+    "mtime": 1781048323.5895352,
+    "ast_hash": "b7865107cdbeab07bfd95c38769e0b09",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-09--2334--vault-session-sync-cron.md": {
+    "mtime": 1781070697.454141,
+    "ast_hash": "7c34d450f7d97892b4da96d63d04bf5e",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-10--0545--vault-session-sync-cron.md": {
+    "mtime": 1781114710.3084662,
+    "ast_hash": "1741645f54c09151c426f1cdefefd554",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-10--1154--vault-session-sync-cron.md": {
+    "mtime": 1781136915.5986776,
+    "ast_hash": "a04bd59504dacff53963e6da0e0838e7",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-10--1757--vault-session-sync-cron.md": {
+    "mtime": 1781136915.5636775,
+    "ast_hash": "10733826fc47fec32cefe4e2d69a6d2b",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-10--2023--hermes-skill-config-troubleshooting.md": {
+    "mtime": 1781136915.5996776,
+    "ast_hash": "9798deaadbc40455609db81af550c12c",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-11--0012--vault-session-sync-cron.md": {
+    "mtime": 1781159004.6801176,
+    "ast_hash": "124aec353b58388dea21d448cd103023",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-11--0617--vault-session-sync-cron.md": {
+    "mtime": 1781202784.49494,
+    "ast_hash": "34d4905c72b10027272f99f77e45c493",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-11--1226--vault-session-sync-cron-silent.md": {
+    "mtime": 1781224800.728171,
+    "ast_hash": "fdbb7186eb302ceca2e843b19bf89b73",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-11--1827--vault-session-sync-cron.md": {
+    "mtime": 1781224838.8841448,
+    "ast_hash": "f0fbeb0d5ba34ad46648290a1df2f2d9",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-12--0034--vault-session-sync-cron.md": {
+    "mtime": 1781247146.1819744,
+    "ast_hash": "a692cdcb08dd0c86a95f9cc601c13e71",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-12--0643--vault-session-sync-cron.md": {
+    "mtime": 1781269171.5203946,
+    "ast_hash": "f03f48a8c698d653f04f8d98ea9376d6",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-20--0057--new-project-init.md": {
+    "mtime": 1781919614.9482489,
+    "ast_hash": "cd6da05dc0c3bee5b5aed47f033e45cb",
+    "semantic_hash": ""
+  },
+  "decisions.md": {
+    "mtime": 1781920431.493863,
+    "ast_hash": "0a98651c7edb15a2bc064011878ee04e",
+    "semantic_hash": ""
+  },
+  "graphify-conventions.md": {
+    "mtime": 1781026113.2387662,
+    "ast_hash": "d7068973a11b753505697f96c3f6757e",
+    "semantic_hash": ""
+  },
+  "infrastructure.md": {
+    "mtime": 1781920431.5548632,
+    "ast_hash": "74ed50696708d42968f1c6e85dda8efe",
+    "semantic_hash": ""
+  },
+  "profile.md": {
+    "mtime": 1781048632.5970898,
+    "ast_hash": "2cf2c416006532e0e00ae328f993393e",
+    "semantic_hash": ""
+  },
+  "projects.md": {
+    "mtime": 1781920431.553863,
+    "ast_hash": "65e390bce2bc30797fba33a85b978dc3",
+    "semantic_hash": ""
+  },
+  "research-focus.md": {
+    "mtime": 1780938993.68292,
+    "ast_hash": "5429bec0155b9461a440203a08aad402",
+    "semantic_hash": ""
+  },
+  "Projects/UnifiedMemory-Deployment-Plan.md": {
+    "mtime": 1781920099.748201,
+    "ast_hash": "d34f418042dde051278b17367854bf75",
+    "semantic_hash": ""
+  },
+  "Extracted/2026-06-20--facts.md": {
+    "mtime": 1781920373.3137465,
+    "ast_hash": "4ad4c5c060dd157d3035b991ac6f6cd5",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-12--1254--vault-session-sync-cron.md": {
+    "mtime": 1781920230.530461,
+    "ast_hash": "0a056bfc8238258afe422aa7259068a8",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-12--1901--vault-session-sync-cron.md": {
+    "mtime": 1781920230.4894612,
+    "ast_hash": "6ffef8aa0caa9196044ac8c1d17c2aa8",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-17--1922--vault-session-sync-cron.md": {
+    "mtime": 1781920230.430461,
+    "ast_hash": "75edfe776de51bebb8fd7ade223ceb01",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-18--0124--vault-session-sync-cron.md": {
+    "mtime": 1781920229.7834597,
+    "ast_hash": "db6147aa549dfec9bf8298743eea1930",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-18--0725--vault-session-sync-cron.md": {
+    "mtime": 1781920229.7884598,
+    "ast_hash": "18fa859a0d912cf80af2858689e77b62",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-18--1326--vault-session-sync-cron.md": {
+    "mtime": 1781920229.8924599,
+    "ast_hash": "67bfcc31596c15468d48dcb3bfa3211f",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-18--1927--vault-session-sync-cron.md": {
+    "mtime": 1781920229.5824592,
+    "ast_hash": "476dd6a2062d82d9ff152a880d268a32",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-19--0128--vault-session-sync-cron.md": {
+    "mtime": 1781920229.94846,
+    "ast_hash": "e0789fa3136c4d2bee6f244b9e1ee3f2",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-19--0729--vault-session-sync-cron.md": {
+    "mtime": 1781920229.7984598,
+    "ast_hash": "cb8203b3b847bfb1bdf85cd136fd9274",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-19--1330--vault-session-sync-cron.md": {
+    "mtime": 1781920229.8834598,
+    "ast_hash": "674c4e1482f44d3f9f67a26d470cc503",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-19--1931--vault-session-sync-cron.md": {
+    "mtime": 1781920229.6694596,
+    "ast_hash": "74bea2fe43b60a1f056f90d1610799ac",
+    "semantic_hash": ""
+  },
+  "Sessions/2026-06-20--0057--unified-memory-hackathon-analysis.md": {
+    "mtime": 1781920110.421222,
+    "ast_hash": "62e6f2c1d9afe82a8ad704209e2f1c3c",
+    "semantic_hash": ""
+  }
+}
