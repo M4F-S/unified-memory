@@ -15,3 +15,5 @@ watch-history.json
 *.zip
 credentials.json
 token.json
+data/users.json
+*.tsbuildinfo

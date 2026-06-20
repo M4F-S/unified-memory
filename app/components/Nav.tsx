@@ -1,20 +1,28 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 const links = [
   { href: "/", label: "Home" },
   { href: "/onboard", label: "Onboard" },
   { href: "/consent", label: "Consent" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/demo", label: "Demo" },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading, logout } = useAuth();
   const [, setTheme] = useState<"light" | "dark">("dark");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  function handleLogout() {
+    logout();
+    setMobileOpen(false);
+    router.replace("/");
+  }
 
   useEffect(() => {
     const stored = localStorage.getItem("um-theme");
@@ -34,8 +42,6 @@ export default function Nav() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
-
-  const isDemoPage = pathname === "/demo";
 
   return (
     <>
@@ -74,11 +80,39 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          {/* Live Demo button - hide on demo page */}
-          {!isDemoPage && (
-            <Link href="/demo" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
-              Live Demo
-            </Link>
+          {/* Auth controls (desktop) */}
+          {!loading && (
+            user ? (
+              <div className="hidden md:flex items-center gap-4">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium transition-colors hover:text-[#7c3aed]"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm font-medium transition-colors hover:text-[#7c3aed]"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-4">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium transition-colors hover:text-[#7c3aed]"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Login
+                </Link>
+                <Link href="/register" className="text-sm font-medium transition-colors hover:text-[#7c3aed]" style={{ color: "#7c3aed" }}>
+                  Register
+                </Link>
+              </div>
+            )
           )}
 
           {/* Mobile hamburger */}
@@ -129,14 +163,45 @@ export default function Nav() {
                 {l.label}
               </Link>
             ))}
-            <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border-nav)" }}>
-              <Link
-                href="/demo"
-                onClick={() => setMobileOpen(false)}
-                className="btn-primary text-sm px-5 py-2.5 w-full text-center block"
-              >
-                Live Demo
-              </Link>
+            <div className="mt-4 pt-4 flex flex-col gap-2" style={{ borderTop: "1px solid var(--border-nav)" }}>
+              {/* Auth controls (mobile) */}
+              {!loading && (
+                user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="px-4 py-3 rounded-xl text-sm font-medium text-um-text-secondary hover:text-[#7c3aed]"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-3 rounded-xl text-sm font-medium text-left text-um-text-secondary hover:text-[#7c3aed]"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="px-4 py-3 rounded-xl text-sm font-medium text-um-text-secondary hover:text-[#7c3aed]"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileOpen(false)}
+                      className="px-4 py-3 rounded-xl text-sm font-medium hover:text-[#7c3aed]"
+                      style={{ color: "#7c3aed" }}
+                    >
+                      Register
+                    </Link>
+                  </>
+                )
+              )}
             </div>
           </div>
         </>
