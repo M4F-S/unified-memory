@@ -24,9 +24,123 @@ async function get(path: string) {
   }
 }
 
+// ── x402 USDC micropayment ────────────────────────────────────────────────────
+// The Worker returns HTTP 402 with a `PAYMENT-REQUIRED` header describing the
+// USDC charge. We settle it (Circle, demo-grade) and retry with `X-PAYMENT`.
+
+export interface X402Challenge {
+  scheme: string;
+  network: string;       // e.g. "base-sepolia"
+  asset: string;         // USDC contract address
+  payTo: string;         // Circle wallet receiving the payment
+  description: string;
+  maxAmountRequired: string; // micro-USDC (6 decimals), e.g. "1000"
+  amountUsdc: number;        // derived human amount, e.g. 0.001
+}
+
+export interface X402Receipt {
+  receipt: string;        // value sent in the X-PAYMENT header
+  challenge: X402Challenge;
+}
+
+// Sensible default if the browser can't read the header (CORS) or it's absent.
+const DEFAULT_CHALLENGE: X402Challenge = {
+  scheme: "exact",
+  network: "base-sepolia",
+  asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", // USDC base-sepolia
+  payTo: "",
+  description: "Memory query - UnifiedMemory",
+  maxAmountRequired: "1000",
+  amountUsdc: 0.001,
+};
+
+export function defaultChallenge(): X402Challenge {
+  return { ...DEFAULT_CHALLENGE };
+}
+
+export function parsePaymentChallenge(headers: Headers): X402Challenge {
+  try {
+    const raw = headers.get("PAYMENT-REQUIRED");
+    if (!raw) return DEFAULT_CHALLENGE;
+    const c = JSON.parse(raw);
+    const micro = c.maxAmountRequired ?? DEFAULT_CHALLENGE.maxAmountRequired;
+    return {
+      scheme: c.scheme ?? DEFAULT_CHALLENGE.scheme,
+      network: c.network ?? DEFAULT_CHALLENGE.network,
+      asset: c.asset ?? DEFAULT_CHALLENGE.asset,
+      payTo: c.payTo ?? DEFAULT_CHALLENGE.payTo,
+      description: c.description ?? DEFAULT_CHALLENGE.description,
+      maxAmountRequired: String(micro),
+      amountUsdc: Number(micro) / 1e6,
+    };
+  } catch {
+    return DEFAULT_CHALLENGE;
+  }
+}
+
+// Demo-grade Circle settlement. The Worker accepts any non-empty X-PAYMENT, so
+// here we mint a signed-looking receipt and simulate network latency. Swap this
+// for a real Circle/x402 facilitator call to settle on-chain.
+export async function settleUsdcPayment(challenge: X402Challenge): Promise<X402Receipt> {
+  await new Promise((r) => setTimeout(r, 800));
+  const payload = {
+    scheme: challenge.scheme,
+    network: challenge.network,
+    asset: challenge.asset,
+    amount: challenge.maxAmountRequired,
+    payTo: challenge.payTo,
+    settledVia: "circle",
+    ts: Date.now(),
+    nonce: Math.random().toString(16).slice(2, 18),
+  };
+  // base64url-encoded receipt, the shape an x402 facilitator would return
+  const receipt = typeof btoa !== "undefined"
+    ? btoa(JSON.stringify(payload))
+    : Buffer.from(JSON.stringify(payload)).toString("base64");
+  return { receipt, challenge };
+}
+
+export interface RecallOptions {
+  memoryType?: string;
+  platform?: string;
+  onPaymentRequired?: (challenge: X402Challenge) => void;
+  onPaymentSettled?: (receipt: X402Receipt) => void;
+}
+
 // ── MCP Memory Routes ─────────────────────────────────────────────────────────
-export async function recallMemory(query: string, tokenId: string, memoryType = "all", platform = "all") {
-  return post("/mcp/recall_memory", { query, token_id: tokenId, memory_type: memoryType, platform });
+// Full x402 round-trip: call → 402 → settle USDC → retry with X-PAYMENT.
+export async function recallMemory(query: string, tokenId: string, opts: RecallOptions = {}) {
+  const { memoryType = "all", platform = "all", onPaymentRequired, onPaymentSettled } = opts;
+  const body = { query, token_id: tokenId, memory_type: memoryType, platform };
+
+  try {
+    let r = await fetch(`${MCP_URL}/mcp/recall_memory`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    let payment: X402Receipt | null = null;
+
+    if (r.status === 402) {
+      const challenge = parsePaymentChallenge(r.headers);
+      onPaymentRequired?.(challenge);
+      payment = await settleUsdcPayment(challenge);
+      onPaymentSettled?.(payment);
+
+      r = await fetch(`${MCP_URL}/mcp/recall_memory`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-PAYMENT": payment.receipt },
+        body: JSON.stringify(body),
+      });
+    }
+
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) return { ok: false, status: r.status, data, payment };
+    return { ok: true, status: r.status, data, payment };
+  } catch {
+    return { ok: false, status: 0, data: {}, payment: null };
+  }
 }
 
 export async function addMemory(content: string, memoryType: string, source: string, tokenId: string) {
@@ -39,6 +153,12 @@ export async function getMemoryStats(tokenId: string) {
 
 export async function getMcpManifest() {
   return get("/.well-known/mcp");
+}
+
+// Backend health — hits the same MCP host the app talks to (localhost:8000 by default).
+export const MCP_BASE_URL = MCP_URL;
+export async function checkHealth() {
+  return get("/health");
 }
 
 // ── Consent API (Team A implements these endpoints) ────────────────────────────────

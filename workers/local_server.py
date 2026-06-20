@@ -2,7 +2,7 @@
 # FastAPI fallback — same API as the Cloudflare Worker
 # Run: uvicorn workers.local_server:app --host 0.0.0.0 --port 8000
 
-import os, sys, base64, hashlib, json, tempfile
+import os, sys, base64, hashlib, json, tempfile, zipfile
 from datetime import datetime
 from pathlib import Path
 from fastapi import FastAPI, Request, UploadFile, File, Form, Depends, Header, HTTPException
@@ -32,7 +32,11 @@ except Exception as _imp_err:  # pragma: no cover - only on hosts without near-c
 PROTECTED_TOKENS = {"0"}
 
 app = FastAPI(title="UnifiedMemory MCP Server (local fallback)")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# expose_headers lets browser clients read the x402 `PAYMENT-REQUIRED` challenge.
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+    expose_headers=["PAYMENT-REQUIRED"],
+)
 
 # Email/password auth (bcrypt + JWT) for the demo frontend. Guarded so a missing
 # auth dep never takes down the MCP surface or the existing test suite.
@@ -56,6 +60,34 @@ except Exception as _ingest_err:  # pragma: no cover - only on hosts without ing
 
 # JSON export parsers that work from a single uploaded file (no OAuth / API keys).
 UPLOAD_CONNECTORS = {"chatgpt", "claude", "telegram"}
+
+# Real platform exports ship as a .zip; the parser only needs the inner JSON.
+# Map each connector to the file it expects inside the archive.
+ZIP_INNER_FILE = {"chatgpt": "conversations.json", "claude": "conversations.json", "telegram": "result.json"}
+
+
+def _extract_export_from_zip(zip_path: str, platform: str) -> str:
+    """Pull the connector's JSON file out of an uploaded .zip into a temp file.
+
+    Prefers the platform's expected name (e.g. chatgpt -> conversations.json),
+    then any matching basename anywhere in the archive, then the first .json.
+    Returns the path to the extracted temp file (caller cleans it up).
+    """
+    want = ZIP_INNER_FILE.get(platform, "").lower()
+    with zipfile.ZipFile(zip_path) as zf:
+        names = [n for n in zf.namelist() if not n.endswith("/")]
+        json_names = [n for n in names if n.lower().endswith(".json")]
+        match = (
+            next((n for n in json_names if Path(n).name.lower() == want), None)
+            or next((n for n in json_names if want and want in n.lower()), None)
+            or (json_names[0] if json_names else None)
+        )
+        if not match:
+            raise ValueError(f"No JSON export found inside the .zip for '{platform}'")
+        data = zf.read(match)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as fh:
+        fh.write(data)
+        return fh.name
 
 NEAR_RPC         = os.getenv("NEAR_RPC", "https://rpc.testnet.near.org")
 NEAR_CONTRACT_ID = os.getenv("NEAR_CONTRACT_ID", "consent-nft.testnet")
@@ -432,7 +464,7 @@ def ingest_upload_connectors():
     """List the upload-based connectors the frontend can offer (no auth)."""
     labels = {"chatgpt": "ChatGPT", "claude": "Claude", "telegram": "Telegram"}
     return {"connectors": [
-        {"platform": p, "label": labels.get(p, p.title()), "auth": "upload", "accept": ".json"}
+        {"platform": p, "label": labels.get(p, p.title()), "auth": "upload", "accept": ".json,.zip"}
         for p in sorted(UPLOAD_CONNECTORS)
     ]}
 
@@ -455,21 +487,32 @@ async def ingest_upload(
             "error": f"Upload not supported for '{platform}'. Supported: {sorted(UPLOAD_CONNECTORS)}"})
 
     namespace = user["id"]
-    suffix = Path(file.filename or "upload.json").suffix or ".json"
-    tmp_path = None
+    suffix = Path(file.filename or "upload.json").suffix.lower() or ".json"
+    tmp_path = None      # the raw uploaded file (.json or .zip)
+    parse_path = None    # the JSON path actually handed to the connector
     try:
         contents = await file.read()
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as fh:
             fh.write(contents)
             tmp_path = fh.name
-        count = await run_in_threadpool(run_connector, platform, namespace, source_path=tmp_path)
+        # A real ChatGPT/Claude/Telegram export is a .zip; pull the inner JSON out.
+        if suffix == ".zip":
+            parse_path = _extract_export_from_zip(tmp_path, platform)
+        else:
+            parse_path = tmp_path
+        count = await run_in_threadpool(run_connector, platform, namespace, source_path=parse_path)
+    except zipfile.BadZipFile:
+        return JSONResponse(status_code=422, content={"error": "Uploaded file is not a valid .zip archive"})
     except json.JSONDecodeError:
         return JSONResponse(status_code=422, content={"error": "Uploaded file is not valid JSON"})
+    except ValueError as e:
+        return JSONResponse(status_code=422, content={"error": str(e)})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": f"{type(e).__name__}: {e}"})
     finally:
-        if tmp_path and os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        for p in {tmp_path, parse_path}:
+            if p and os.path.exists(p):
+                os.unlink(p)
 
     return {"platform": platform, "ingested": count, "namespace": namespace}
 

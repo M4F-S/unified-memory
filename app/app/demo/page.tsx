@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { recallMemory, revokeConsent, MOCK_RECALL_RESPONSE } from "@/lib/api";
+import { recallMemory, revokeConsent, settleUsdcPayment, defaultChallenge, checkHealth, MOCK_RECALL_RESPONSE, type X402Receipt, type X402Challenge } from "@/lib/api";
 
 interface Memory {
   content: string;
@@ -11,6 +11,12 @@ interface Memory {
   score: number;
 }
 
+interface Payment {
+  amountUsdc: number;
+  network: string;
+  receipt: string;
+}
+
 interface Run {
   id: number;
   query: string;
@@ -19,6 +25,7 @@ interface Run {
   cost: number;
   status: "thinking" | "done" | "blocked" | "error";
   blockedReason?: string;
+  payment?: Payment;
 }
 
 const DEMO_TASKS = [
@@ -40,11 +47,10 @@ export default function Demo() {
   const [backendLive, setBackendLive] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Check backend health on mount
+  // Check backend health on mount — same MCP host the app queries (localhost:8000 by default)
   useEffect(() => {
-    fetch("http://187.124.2.26:8000/health", { method: "GET" })
-      .then((r) => r.ok)
-      .then((ok) => setBackendLive(ok))
+    checkHealth()
+      .then((r) => setBackendLive(r.ok))
       .catch(() => setBackendLive(false));
   }, []);
 
@@ -75,6 +81,9 @@ export default function Demo() {
     return () => observer.disconnect();
   }, []);
 
+  const pushThink = (id: number, text: string) =>
+    setRuns((prev) => prev.map((r) => (r.id === id ? { ...r, thinking: [...r.thinking, text] } : r)));
+
   const runQuery = async (query: string) => {
     if (running) return;
     setRunning(true);
@@ -82,18 +91,17 @@ export default function Demo() {
     const newRun: Run = { id, query, thinking: ["🤖 Agent initializing..."], memories: [], cost: 0, status: "thinking" };
     setRuns((prev) => [...prev, newRun]);
 
-    const thinkingSteps = [
+    const preSteps = [
       "🔍 Analyzing query intent...",
       "🔑 Checking NEAR Consent NFT...",
       revoked ? "❌ Consent revoked — blocking access" : "✅ Consent valid — proceeding",
       revoked ? "" : "🗺️ Searching vector memory graph...",
       revoked ? "" : "📦 Retrieving relevant memories...",
-      revoked ? "" : "💵 Calculating query cost...",
     ].filter(Boolean);
 
-    for (let i = 0; i < thinkingSteps.length; i++) {
+    for (const step of preSteps) {
       await new Promise((r) => setTimeout(r, 500));
-      setRuns((prev) => prev.map((r) => (r.id === id ? { ...r, thinking: [...r.thinking, thinkingSteps[i]] } : r)));
+      pushThink(id, step);
     }
 
     if (revoked) {
@@ -102,9 +110,32 @@ export default function Demo() {
       return;
     }
 
-    // Try real API, fallback to mock
-    const apiResult = await recallMemory(query, tokenId);
-    const data = apiResult.ok && apiResult.data?.result ? apiResult.data : MOCK_RECALL_RESPONSE;
+    // x402 USDC micropayment — surfaced live (real 402 round-trip) or simulated for the demo fallback
+    let payment: Payment | undefined;
+    const onRequired = (c: X402Challenge) =>
+      pushThink(id, `💳 402 Payment Required — ${c.amountUsdc.toFixed(3)} USDC on ${c.network}`);
+    const onSettled = (rcpt: X402Receipt) => {
+      pushThink(id, "🔵 Settling via Circle (x402)...");
+      pushThink(id, `✅ Payment confirmed — receipt ${rcpt.receipt.slice(0, 16)}…`);
+      payment = { amountUsdc: rcpt.challenge.amountUsdc, network: rcpt.challenge.network, receipt: rcpt.receipt };
+    };
+
+    // Try real API (handles the 402 → settle → retry round-trip), fallback to mock
+    const apiResult = await recallMemory(query, tokenId, { onPaymentRequired: onRequired, onPaymentSettled: onSettled });
+
+    let data;
+    if (apiResult.ok && apiResult.data?.result) {
+      data = apiResult.data;
+    } else {
+      // Offline/demo: simulate the same x402 USDC settlement so the payment flow stays visible
+      if (!payment) {
+        const challenge = defaultChallenge();
+        onRequired(challenge);
+        const rcpt = await settleUsdcPayment(challenge);
+        onSettled(rcpt);
+      }
+      data = MOCK_RECALL_RESPONSE;
+    }
 
     setRuns((prev) =>
       prev.map((r) =>
@@ -114,6 +145,7 @@ export default function Demo() {
               memories: data.result?.memories ?? [],
               cost: data.result?.query_cost_usdc ?? 0.001,
               status: "done",
+              payment,
             }
           : r
       )
@@ -235,10 +267,23 @@ export default function Demo() {
       <div ref={scrollRef} className="space-y-6 max-h-[70vh] overflow-y-auto scrollbar-thin pr-2">
         {runs.map((run, idx) => (
           <div key={run.id} className="glass-card p-6 animate-fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 gap-3">
               <span className="font-bold text-sm text-um-text">{run.query}</span>
-              {run.status === "done" && <span className="text-xs font-bold text-um-primary">-${run.cost.toFixed(3)} USDC</span>}
-              {run.status === "blocked" && <span className="text-xs font-bold text-red-400">❌ BLOCKED</span>}
+              {run.status === "done" && (
+                <span className="flex items-center gap-2 shrink-0">
+                  {run.payment && (
+                    <span
+                      className="flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-400/30 text-blue-300"
+                      style={{ background: "rgba(59,130,246,0.08)" }}
+                      title={`x402 · paid via Circle · receipt ${run.payment.receipt.slice(0, 24)}…`}
+                    >
+                      🔵 x402 · Circle · {run.payment.network}
+                    </span>
+                  )}
+                  <span className="text-xs font-bold text-um-primary">-${run.cost.toFixed(3)} USDC</span>
+                </span>
+              )}
+              {run.status === "blocked" && <span className="text-xs font-bold text-red-400 shrink-0">❌ BLOCKED</span>}
             </div>
 
             {/* Thinking Stream */}

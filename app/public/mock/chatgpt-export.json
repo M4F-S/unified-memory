@@ -1,0 +1,170 @@
+[
+  {
+    "title": "Planning a trip to Lisbon",
+    "create_time": 1746028800.0,
+    "update_time": 1746032400.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746028810.0, "content": { "content_type": "text", "parts": ["I'm planning a 5-day trip to Lisbon in September. I love seafood, vintage trams, and quiet neighborhoods over touristy spots. Can you build me an itinerary?"] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746028850.0, "content": { "content_type": "text", "parts": ["Absolutely! Here's a 5-day Lisbon itinerary balancing seafood spots, tram rides, and calmer areas like Alfama and Graça..."] } },
+        "parent": "node-1",
+        "children": ["node-3"]
+      },
+      "node-3": {
+        "id": "node-3",
+        "message": { "id": "m3", "author": { "role": "user" }, "create_time": 1746029000.0, "content": { "content_type": "text", "parts": ["Perfect. I'm vegetarian on weekdays though, so please keep Monday-Friday meat-free."] } },
+        "parent": "node-2",
+        "children": []
+      }
+    }
+  },
+  {
+    "title": "Debugging a Python asyncio deadlock",
+    "create_time": 1746201600.0,
+    "update_time": 1746205200.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746201610.0, "content": { "content_type": "text", "parts": ["My FastAPI app hangs when I call an async function from inside a sync route via asyncio.run(). Why does this deadlock?"] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746201660.0, "content": { "content_type": "text", "parts": ["You're nesting event loops. FastAPI already runs inside an event loop, so asyncio.run() tries to start a second one..."] } },
+        "parent": "node-1",
+        "children": ["node-3"]
+      },
+      "node-3": {
+        "id": "node-3",
+        "message": { "id": "m3", "author": { "role": "user" }, "create_time": 1746201800.0, "content": { "content_type": "text", "parts": ["Got it — I switched to run_in_threadpool for the blocking call and it works now. Thanks!"] } },
+        "parent": "node-2",
+        "children": []
+      }
+    }
+  },
+  {
+    "title": "Learning the basics of NEAR smart contracts",
+    "create_time": 1746374400.0,
+    "update_time": 1746378000.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746374410.0, "content": { "content_type": "text", "parts": ["Explain how NEAR's storage staking works and why view calls don't cost gas. I'm coming from an Ethereum/Solidity background."] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746374470.0, "content": { "content_type": "text", "parts": ["Great question. On NEAR, contracts pay for the storage they occupy via locked balance (storage staking), and read-only view calls are executed on an RPC node without a transaction..."] } },
+        "parent": "node-1",
+        "children": []
+      }
+    }
+  },
+  {
+    "title": "Marathon training plan",
+    "create_time": 1746547200.0,
+    "update_time": 1746550800.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746547210.0, "content": { "content_type": "text", "parts": ["I want to run my first marathon in 16 weeks. I currently run 5k comfortably three times a week. Build me a beginner-friendly plan that protects my knees."] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746547280.0, "content": { "content_type": "text", "parts": ["Here's a 16-week plan with a gradual mileage build, one long run per week, and two rest/cross-training days to spare your knees..."] } },
+        "parent": "node-1",
+        "children": ["node-3"]
+      },
+      "node-3": {
+        "id": "node-3",
+        "message": { "id": "m3", "author": { "role": "user" }, "create_time": 1746547500.0, "content": { "content_type": "text", "parts": ["Can you swap the Sunday long runs to Saturdays? Sundays are family time for me."] } },
+        "parent": "node-2",
+        "children": []
+      }
+    }
+  },
+  {
+    "title": "Choosing a vector database",
+    "create_time": 1746720000.0,
+    "update_time": 1746723600.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746720010.0, "content": { "content_type": "text", "parts": ["For a side project storing ~100k embeddings with per-user namespaces, should I use Pinecone, Qdrant, or pgvector? I care about fast setup and a generous free tier."] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746720080.0, "content": { "content_type": "text", "parts": ["For fast setup with namespaces out of the box, Pinecone's serverless tier is the smoothest. Qdrant is great if you want to self-host..."] } },
+        "parent": "node-1",
+        "children": []
+      }
+    }
+  },
+  {
+    "title": "Gift ideas for my sister",
+    "create_time": 1746892800.0,
+    "update_time": 1746896400.0,
+    "mapping": {
+      "node-0": {
+        "id": "node-0",
+        "message": { "id": "m0", "author": { "role": "system" }, "content": { "content_type": "text", "parts": [""] } },
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": { "id": "m1", "author": { "role": "user" }, "create_time": 1746892810.0, "content": { "content_type": "text", "parts": ["My sister turns 30 next month. She's into pottery, cold-brew coffee, and indie folk music. Budget is around 80 euros. Any thoughtful gift ideas?"] } },
+        "parent": "node-0",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": { "id": "m2", "author": { "role": "assistant" }, "create_time": 1746892870.0, "content": { "content_type": "text", "parts": ["Lovely combo! A few ideas under 80 euros: a pottery class voucher, a quality cold-brew maker, or vinyl from an indie folk artist she follows..."] } },
+        "parent": "node-1",
+        "children": []
+      }
+    }
+  }
+]

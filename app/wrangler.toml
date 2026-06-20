@@ -1,0 +1,13 @@
+# Cloudflare Pages config for the UnifiedMemory frontend (Next.js static export).
+# Next builds a fully static site (next.config.js: output: 'export' -> dist/),
+# so this deploys as plain static assets — no SSR / Pages Functions needed.
+#
+# Deploy:  cd app && npm run deploy      (runs `next build` then `wrangler pages deploy`)
+#
+# NEXT_PUBLIC_MCP_URL must point at the live Worker and be set AT BUILD TIME
+# (Next inlines NEXT_PUBLIC_* at build). Set it in the shell before `npm run deploy`,
+# or in the Cloudflare Pages dashboard → Settings → Environment variables (Production).
+
+name = "unified-memory-app"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "dist"

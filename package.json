@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "cd app && npm run dev",
     "deploy:workers": "cd workers && wrangler deploy",
+    "deploy:pages": "cd app && npm run deploy",
     "deploy:contract": "cd contracts && near dev-deploy",
     "demo": "uv run python demo/agent.py",
     "load-demo-data": "uv run python -c \"from ingestion.synthesis import load_demo_memories; load_demo_memories()\"",

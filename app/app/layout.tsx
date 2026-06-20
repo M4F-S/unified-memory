@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { AuthProvider } from "@/lib/auth-context";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "UnifiedMemory — Your Digital Memory OS",
@@ -28,8 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased">
         <AuthProvider>
-          <Nav />
-          <main className="relative z-10">{children}</main>
+          <ToastProvider>
+            <Nav />
+            <main className="relative z-10">{children}</main>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

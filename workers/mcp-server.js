@@ -8,7 +8,12 @@ import { validateConsent, getConsent, recordQuery } from './consent-gate.js';
 import { checkPayment } from './x402-gate.js';
 
 const app = new Hono();
-app.use('*', cors());
+// Expose the x402 `PAYMENT-REQUIRED` challenge header and allow the `X-PAYMENT`
+// receipt header so browser clients can complete the USDC micropayment round-trip.
+app.use('*', cors({
+  allowHeaders: ['Content-Type', 'X-PAYMENT'],
+  exposeHeaders: ['PAYMENT-REQUIRED'],
+}));
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 

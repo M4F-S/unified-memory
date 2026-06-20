@@ -9,6 +9,8 @@ NEAR_RPC              = "https://rpc.testnet.fastnear.com"
 PINECONE_INDEX_NAME   = "unified-memory"
 PINECONE_HOST         = "unified-memory-rsv5o69.svc.aped-4627-b74a.pinecone.io"
 EAS_SCHEMA_UID        = "0x0000000000000000000000000000000000000000000000000000000000000000"
+# x402 USDC payTo — the Circle wallet that receives the 0.001 USDC per query.
+# Replace with your real Circle wallet (CIRCLE_WALLET_ADDRESS in .env) before deploy.
 CIRCLE_WALLET_ADDRESS = "0x0000000000000000000000000000000000000001"
 INGEST_BACKEND_URL    = ""
 

@@ -1,20 +1,31 @@
 // app/components/UploadConnector.tsx
 // Connect button for the upload-based connectors (ChatGPT / Claude / Telegram).
-// Picks a JSON export, uploads it to /ingest/upload with the user's JWT, and
-// shows the number of memories ingested into their vault.
+// Picks a JSON or ZIP export, uploads it to /ingest/upload with the user's JWT,
+// and fires a toast while the agent embeds + enriches the memories into the
+// user's private vault (Pinecone namespace = user id).
 
 "use client";
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "@/components/Toast";
 import { uploadExport } from "@/lib/ingest-api";
 
 type Status = "idle" | "uploading" | "done" | "error";
 
-export default function UploadConnector({ platform, accept = ".json" }: { platform: string; accept?: string }) {
+export default function UploadConnector({
+  platform,
+  accept = ".json,.zip",
+  onIngested,
+}: {
+  platform: string;
+  accept?: string;
+  onIngested?: (count: number) => void;
+}) {
   const { user, token } = useAuth();
   const router = useRouter();
+  const { toast, update } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string>("");
@@ -22,6 +33,7 @@ export default function UploadConnector({ platform, accept = ".json" }: { platfo
 
   function onConnectClick() {
     if (!user || !token) {
+      toast({ title: "Sign in first", description: "Log in to import your export into your private vault.", variant: "info" });
       router.push("/login");
       return;
     }
@@ -35,15 +47,32 @@ export default function UploadConnector({ platform, accept = ".json" }: { platfo
 
     setStatus("uploading");
     setMessage("Importing…");
+    const toastId = toast({
+      title: "Agent is processing your export",
+      description: `${file.name} — classifying, embedding & enriching into your memory vault…`,
+      variant: "loading",
+    });
+
     const res = await uploadExport(platform, file, token);
     if (res.ok) {
       const n = res.data.ingested ?? 0;
       setCount(n);
       setStatus("done");
       setMessage(`Imported ${n} ${n === 1 ? "memory" : "memories"}`);
+      update(toastId, {
+        title: "Memories enriched 🎉",
+        description: `${n} ${n === 1 ? "memory" : "memories"} embedded into your private vault.`,
+        variant: "success",
+      });
+      onIngested?.(n);
     } else {
       setStatus("error");
       setMessage(res.error || "Upload failed");
+      update(toastId, {
+        title: "Import failed",
+        description: res.error || "Upload failed. Please try again.",
+        variant: "error",
+      });
     }
   }
 

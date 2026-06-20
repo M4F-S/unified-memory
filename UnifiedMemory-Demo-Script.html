@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UnifiedMemory — Demo Script</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1a1a2e;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .cover {
+    border-radius: 14px;
+    padding: 26px 28px;
+    margin-bottom: 22px;
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 55%, #06b6d4 100%);
+    color: #fff;
+  }
+  .cover .kicker {
+    font-size: 8.5pt; letter-spacing: 2px; text-transform: uppercase;
+    opacity: .85; font-weight: 700; margin-bottom: 8px;
+  }
+  .cover h1 { font-size: 24pt; margin: 0 0 6px; font-weight: 800; letter-spacing: -.3px; }
+  .cover .sub { font-size: 11pt; opacity: .92; margin: 0; }
+  .meta {
+    display: flex; gap: 18px; margin-top: 16px; flex-wrap: wrap;
+    font-size: 9pt; opacity: .95;
+  }
+  .meta b { font-weight: 700; }
+
+  .tip {
+    background: #f3f0ff;
+    border-left: 3px solid #7c3aed;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 9.5pt;
+    color: #3b3460;
+    margin-bottom: 20px;
+  }
+
+  .scene { margin-bottom: 16px; page-break-inside: avoid; }
+  .scene-head {
+    display: flex; align-items: baseline; gap: 10px;
+    border-bottom: 1.5px solid #e6e1f5;
+    padding-bottom: 5px; margin-bottom: 9px;
+  }
+  .scene-num {
+    background: #7c3aed; color: #fff; font-weight: 800;
+    font-size: 8.5pt; border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+  }
+  .scene-title { font-size: 12pt; font-weight: 800; color: #1a1a2e; }
+  .scene-time { margin-left: auto; font-size: 9pt; color: #8a84a3; font-weight: 600; }
+
+  .row { margin: 6px 0; }
+  .label {
+    font-size: 7.5pt; letter-spacing: 1.2px; text-transform: uppercase;
+    font-weight: 800; color: #06b6d4; display: block; margin-bottom: 2px;
+  }
+  .label.vo { color: #7c3aed; }
+  .onscreen { font-size: 9.8pt; color: #3a3550; }
+  .vo-text {
+    font-size: 10.2pt; color: #1a1a2e; font-style: italic;
+    background: #faf8ff; border-radius: 6px; padding: 8px 12px;
+    border: 1px solid #ece7f9;
+  }
+
+  h2.section {
+    font-size: 12pt; font-weight: 800; color: #4f46e5;
+    margin: 22px 0 8px; padding-top: 6px;
+    border-top: 1.5px solid #e6e1f5;
+  }
+  ul.notes { margin: 0; padding-left: 18px; }
+  ul.notes li { margin-bottom: 6px; font-size: 9.8pt; }
+  .footer {
+    margin-top: 24px; padding-top: 10px; border-top: 1px solid #e6e1f5;
+    font-size: 8pt; color: #9a94b0; text-align: center;
+  }
+  code { background: #efeafd; padding: 1px 5px; border-radius: 4px; font-size: 8.8pt; color: #5b21b6; }
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="kicker">Screen Recording + Voiceover Script</div>
+    <h1>UnifiedMemory — Live Demo</h1>
+    <p class="sub">Your entire digital life. One unified memory. Consent-controlled, on-chain.</p>
+    <div class="meta">
+      <span><b>Runtime:</b> ~2:00</span>
+      <span><b>Language:</b> English</span>
+      <span><b>Tone:</b> confident, fast, founder-pitch</span>
+      <span><b>Flow:</b> Home &rarr; Onboard &rarr; Consent &rarr; Demo &rarr; Dashboard</span>
+    </div>
+  </div>
+
+  <div class="tip">
+    <b>Recording tip:</b> Record at 1080p+, browser full screen, hide the bookmarks bar.
+    Move the cursor slowly and deliberately — pause ~1s on each key element so the viewer's eye can follow.
+  </div>
+
+  <!-- Scene 1 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 1</span>
+      <span class="scene-title">Hook / Landing Hero</span>
+      <span class="scene-time">0:00 – 0:18</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Open the landing page (<code>/</code>). Let the aurora background and hero animate in. Slowly scroll so "Your entire digital life. One unified memory." and the live <b>Memory Graph</b> card (Gmail 847, Spotify 1,240, YouTube 4,200…) are visible.</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"Your digital life is scattered across twenty-plus platforms — Gmail, GitHub, ChatGPT, Spotify, and more. Your AI agents see none of it. UnifiedMemory changes that. It collects everything into one memory graph, and gives your agents secure, consent-controlled access through a single MCP endpoint."</div>
+    </div>
+  </div>
+
+  <!-- Scene 2 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 2</span>
+      <span class="scene-title">How It Works + Memory Layers</span>
+      <span class="scene-time">0:18 – 0:35</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Scroll through the "Five steps to total memory" cards (Connect &rarr; Synthesize &rarr; Mint Consent NFT &rarr; Agent Queries &rarr; Revoke). Pause briefly on the <b>five memory types</b> chips (Episodic, Semantic, Procedural, Social, Preferential).</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"Here's how it works. We classify every data point into five layers of human memory — episodic, semantic, procedural, social, and preferential — and store them as searchable vectors. You stay in control through an on-chain Consent NFT. And every agent query costs a fraction of a cent in USDC."</div>
+    </div>
+  </div>
+
+  <!-- Scene 3 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 3</span>
+      <span class="scene-title">Onboard / Connect Platforms</span>
+      <span class="scene-time">0:35 – 0:55</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Click <b>Onboard</b> in the nav. Show the platform grid. Hover the <b>LIVE</b> badges on ChatGPT, Claude, and Telegram. Click one <b>Upload</b> button and select an export file (have a small <code>conversations.json</code> ready). Show the <b>Memory Graph</b> sidebar count tick.</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"You connect your platforms in one place — either via OAuth, or by uploading your GDPR data export. ChatGPT, Claude, and Telegram are live right now: I drop in my export, and it's parsed, classified, and synthesized straight into my private memory vault."</div>
+    </div>
+  </div>
+
+  <!-- Scene 4 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 4</span>
+      <span class="scene-title">Consent NFT</span>
+      <span class="scene-time">0:55 – 1:18</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Click <b>Consent</b>. Set the <b>Agent ID</b>, toggle a few <b>platforms</b> and <b>memory types</b>, drag the three sliders — <b>Max Queries</b>, <b>USDC Budget</b>, <b>Expires In</b>. Click "Mint Consent NFT on NEAR." Show the green success state / explorer link, then the <b>Active Consent NFTs</b> list.</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"Before any agent touches my data, I mint a Consent NFT on NEAR. I define exactly what it can access — which platforms, which memory types, how many queries, and what budget. I hit mint, and it's written on-chain — immutable, cryptographic proof of consent. No access without it."</div>
+    </div>
+  </div>
+
+  <!-- Scene 5 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 5</span>
+      <span class="scene-title">Live Demo: Query + Pay + Revoke</span>
+      <span class="scene-time">1:18 – 1:48</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Open the <b>Demo</b> page (<code>/demo</code> — reachable from the landing "Revoke Consent" card). Click a task like <i>"What have I worked on most intensively this week?"</i> Let the thinking stream play (Checking NEAR Consent NFT &rarr; Consent valid &rarr; Searching vector graph), then show retrieved memories and the <b>&minus;$0.001 USDC</b> cost. Then click "REVOKE CONSENT — Burn NFT on NEAR." Wait for the red <b>CONSENT REVOKED ON-CHAIN</b> banner. Run the same query again &rarr; show it get <b>BLOCKED</b>.</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"Now an agent queries my memory. It checks the Consent NFT, searches the vector graph, returns the relevant memories — and pays one-tenth of a cent per query via Circle's x402. And here's the part that makes us different: I revoke consent. The NFT is burned on-chain… and the moment I run that query again — blocked. Instantly. No agent can touch my data without live, on-chain permission."</div>
+    </div>
+  </div>
+
+  <!-- Scene 6 -->
+  <div class="scene">
+    <div class="scene-head">
+      <span class="scene-num">SCENE 6</span>
+      <span class="scene-title">Dashboard + Close</span>
+      <span class="scene-time">1:48 – 2:00</span>
+    </div>
+    <div class="row">
+      <span class="label">On screen</span>
+      <span class="onscreen">Click <b>Dashboard</b>. Show the stat row (Total Memories, Queries Used, USDC Spent / Remaining), the <b>Query Log</b> with the blocked entry in red, and the <b>NFT Status</b> card.</span>
+    </div>
+    <div class="row">
+      <span class="label vo">Voiceover</span>
+      <div class="vo-text">"Everything is auditable — a live query log, real-time spend, and NFT status, all in one dashboard. UnifiedMemory: your entire digital life, one memory, and you decide who remembers. Built at the AI Agents Berlin Hackathon."</div>
+    </div>
+  </div>
+
+  <h2 class="section">Production Notes</h2>
+  <ul class="notes">
+    <li><b>Pre-stage state:</b> Have an export file ready for Scene 3, and pre-set a token ID in the Demo page input so the revoke/block works smoothly. Do a dry run first — the revoke is irreversible against real tokens (token <code>0</code> is protected), so use a demo token.</li>
+    <li><b>Cut for a 60-second version:</b> keep Scenes 1, 4, and 5 only — the hook, the consent mint, and the revoke-blocks-the-agent moment. That revoke is your strongest beat; land it cleanly.</li>
+    <li><b>Captions:</b> burn in subtitles — judges often watch muted on first pass.</li>
+    <li><b>Recording app (Windows 11):</b> OBS Studio for a clean take (separate mic track), or Xbox Game Bar (<code>Win + Alt + R</code>) for a quick one-shot. Trim &amp; caption in Clipchamp.</li>
+  </ul>
+
+  <div class="footer">
+    UnifiedMemory · AI Agents Berlin Hackathon 2026 · Built at 42Berlin · GDPR &middot; NEAR &middot; Circle &middot; Cloudflare MCP
+  </div>
+
+</body>
+</html>
