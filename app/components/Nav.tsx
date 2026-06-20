@@ -8,7 +8,6 @@ const links = [
   { href: "/onboard", label: "Onboard" },
   { href: "/consent", label: "Consent" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/demo", label: "Demo" },
 ];
 
 export default function Nav() {
@@ -25,7 +24,6 @@ export default function Nav() {
     document.body.classList.add("theme-ready");
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
       document.body.style.overflow = "hidden";
@@ -34,8 +32,6 @@ export default function Nav() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
-
-  const isDemoPage = pathname === "/demo";
 
   return (
     <>
@@ -56,7 +52,6 @@ export default function Nav() {
           UnifiedMemory
         </Link>
 
-        {/* Desktop nav */}
         <ul className="hidden md:flex gap-8 list-none">
           {links.map((l) => (
             <li key={l.href}>
@@ -74,14 +69,10 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          {/* Live Demo button - hide on demo page */}
-          {!isDemoPage && (
-            <Link href="/demo" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
-              Live Demo
-            </Link>
-          )}
+          <Link href="/login" className="hidden md:inline-flex btn-primary text-sm px-5 py-2.5">
+            Login
+          </Link>
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-1.5"
@@ -95,15 +86,12 @@ export default function Nav() {
         </div>
       </nav>
 
-      {/* Mobile drawer */}
       {mobileOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-[49] bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          {/* Menu panel */}
           <div
             className="fixed top-16 right-0 bottom-0 z-[49] w-[280px] border-l p-6 flex flex-col gap-2 animate-slide-in-right md:hidden"
             style={{
@@ -131,11 +119,11 @@ export default function Nav() {
             ))}
             <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border-nav)" }}>
               <Link
-                href="/demo"
+                href="/login"
                 onClick={() => setMobileOpen(false)}
                 className="btn-primary text-sm px-5 py-2.5 w-full text-center block"
               >
-                Live Demo
+                Login
               </Link>
             </div>
           </div>
