@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnifiedMemory — Pitch Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050508;
+      --surface: rgba(255,255,255,0.025);
+      --border: rgba(255,255,255,0.06);
+      --text-primary: #f0f0f5;
+      --text-secondary: #8a8a9a;
+      --accent: #a855f7;
+      --accent-2: #3b82f6;
+      --accent-glow: rgba(168,85,247,0.35);
+      --success: #22d3aa;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+
+    /* Ambient background */
+    .ambient {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 40%, rgba(168,85,247,0.12), transparent),
+        radial-gradient(ellipse 60% 50% at 80% 60%, rgba(59,130,246,0.10), transparent),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(168,85,247,0.08), transparent);
+    }
+
+    .ambient::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+      filter: blur(80px); opacity: 0.35;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 400px; height: 400px; background: #7c3aed; top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: #3b82f6; bottom: -50px; right: -50px; animation-delay: -7s; }
+    .orb-3 { width: 250px; height: 250px; background: #a855f7; top: 50%; left: 60%; animation-delay: -14s; }
+    @keyframes orbFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(30px,-40px) scale(1.1); }
+      66% { transform: translate(-20px,20px) scale(0.95); }
+    }
+
+    /* Grid overlay */
+    .grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    }
+
+    /* Slide deck */
+    .deck {
+      position: relative; z-index: 1;
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .slide {
+      display: none;
+      width: min(1100px, 90vw);
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 60px 80px;
+      animation: slideIn 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .slide.active { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(8px); }
+      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    /* Typography */
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; line-height: 1.1; }
+
+    .hero-title {
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #a855f7 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #ddd6fe 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+      margin-bottom: 40px;
+    }
+
+    .subtitle {
+      font-size: 1.35rem; color: var(--text-secondary); font-weight: 400;
+      max-width: 600px; line-height: 1.6;
+    }
+
+    .big-stat {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 700;
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .label {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--accent); font-weight: 600;
+    }
+
+    /* Glass cards */
+    .glass {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      padding: 32px;
+      position: relative; overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glass::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    .glass:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(168,85,247,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    /* Glow borders */
+    .glow-border {
+      position: relative;
+      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(59,130,246,0.04));
+      border-radius: 20px; padding: 2px;
+    }
+    .glow-border-inner {
+      background: var(--bg); border-radius: 18px; padding: 32px;
+      height: 100%;
+    }
+
+    /* Lists */
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 16px;
+      font-size: 1.05rem; color: var(--text-secondary); line-height: 1.5;
+    }
+    .feature-list li::before {
+      content: ''; flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      margin-top: 8px; box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 32px; border-radius: 12px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white; font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; border: none; cursor: pointer;
+      box-shadow: 0 4px 24px rgba(168,85,247,0.3);
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(168,85,247,0.45);
+    }
+
+    /* Architecture blocks */
+    .arch-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+    .arch-block {
+      background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(59,130,246,0.05));
+      border: 1px solid rgba(168,85,247,0.2);
+      border-radius: 16px; padding: 20px 28px;
+      text-align: center; min-width: 140px;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+    .arch-block:hover {
+      border-color: rgba(168,85,247,0.5);
+      box-shadow: 0 0 30px rgba(168,85,247,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Progress */
+    .progress-bar {
+      position: fixed; bottom: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.4s ease; z-index: 100;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .slide-counter {
+      position: fixed; bottom: 24px; right: 32px; z-index: 100;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem;
+      color: var(--text-secondary); font-weight: 500;
+    }
+
+    /* Nav hints */
+    .nav-hint {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100;
+      display: flex; gap: 8px; align-items: center;
+      font-size: 0.75rem; color: var(--text-secondary);
+      opacity: 0.6;
+    }
+    .nav-hint kbd {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 10px; font-family: inherit; font-size: 0.7rem;
+    }
+
+    /* Screenshots area */
+    .screenshot-frame {
+      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(59,130,246,0.04));
+      border: 1px solid rgba(168,85,247,0.15);
+      border-radius: 16px; padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .screenshot-frame::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(168,85,247,0.05) 100%);
+      pointer-events: none;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+    .anim-d1 { animation-delay: 0.1s; }
+    .anim-d2 { animation-delay: 0.2s; }
+    .anim-d3 { animation-delay: 0.3s; }
+    .anim-d4 { animation-delay: 0.4s; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 3px; }
+
+    /* Print */
+    @media print {
+      .ambient, .orb, .grid, .nav-hint, .progress-bar, .slide-counter { display: none !important; }
+      .slide { display: block !important; page-break-after: always; }
+      body { background: #fff !important; color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid"></div>
+
+  <div class="progress-bar" id="progress"></div>
+  <div class="slide-counter" id="counter">1 / 8</div>
+  <div class="nav-hint"><kbd>←</kbd> Prev <kbd>→</kbd> Next <kbd>F</kbd> Fullscreen</div>
+
+  <div class="deck" id="deck">
+
+    <!-- SLIDE 1: TITLE -->
+    <div class="slide active" data-index="0">
+      <div style="text-align: center; padding-top: 40px;">
+        <div class="label anim-fade-up" style="margin-bottom: 20px;">Hackathon Pitch • Demo Day 2026</div>
+        <h1 class="hero-title anim-fade-up anim-d1">UnifiedMemory</h1>
+        <p class="subtitle anim-fade-up anim-d2" style="margin: 0 auto 40px;">
+          The first platform that gives AI agents secure, consent-controlled access to your entire digital life.
+        </p>
+        <div class="anim-fade-up anim-d3" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <span class="glass" style="display: inline-block; padding: 12px 24px; font-size: 0.9rem; color: var(--text-secondary);">
+            <strong style="color: var(--text-primary);">20+</strong> Platforms
+          </span>
+          <span class="glass" style="display: inline-block; padding: 12px 24px; font-size: 0.9rem; color: var(--text-secondary);">
+            <strong style="color: var(--text-primary);">NEAR</strong> Blockchain
+          </span>
+          <span class="glass" style="display: inline-block; padding: 12px 24px; font-size: 0.9rem; color: var(--text-secondary);">
+            <strong style="color: var(--text-primary);">Live</strong> Demo
+          </span>
+        </div>
+        <div class="anim-fade-up anim-d4" style="margin-top: 60px;">
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            <strong style="color: var(--accent);">Team:</strong> Moe, Bayram, Selcuk, Ali<br>
+            <strong style="color: var(--accent);">Live URL:</strong> unified-memory.kawai-labs.com
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: PROBLEM -->
+    <div class="slide" data-index="1">
+      <div class="label anim-fade-up">The Problem</div>
+      <h2 class="section-title anim-fade-up anim-d1" style="max-width: 700px;">
+        Every AI chat starts<br>from zero.
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 40px;">
+        <div class="glass anim-fade-up anim-d2">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🚫</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 8px; color: var(--text-primary);">No Memory</h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">ChatGPT, Claude, Gemini — none remember your emails, commits, or calendar across sessions.</p>
+        </div>
+        <div class="glass anim-fade-up anim-d3">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🔒</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 8px; color: var(--text-primary);">No Consent</h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">You can't control what data AI accesses, when, or for how long. It's all-or-nothing.</p>
+        </div>
+        <div class="glass anim-fade-up anim-d4">
+          <div style="font-size: 2rem; margin-bottom: 12px;">📊</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 8px; color: var(--text-primary);">No Context</h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Your data is scattered across 20+ platforms. AI can't connect the dots.</p>
+        </div>
+      </div>
+      <p class="anim-fade-up anim-d4" style="margin-top: 32px; font-size: 1.1rem; color: var(--text-secondary); text-align: center;">
+        <em>Result: AI is dumb about <strong style="color: var(--text-primary);">you</strong>.</em>
+      </p>
+    </div>
+
+    <!-- SLIDE 3: SOLUTION -->
+    <div class="slide" data-index="2">
+      <div class="label anim-fade-up">The Solution</div>
+      <h2 class="section-title anim-fade-up anim-d1">One memory graph.<br>Full control.</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; align-items: center;">
+        <div class="anim-fade-up anim-d2">
+          <ul class="feature-list">
+            <li><strong style="color: var(--text-primary);">Unified Graph</strong> — All your data connected in one vector memory store</li>
+            <li><strong style="color: var(--text-primary);">Consent NFTs</strong> — Grant/revoke access on-chain with smart contracts</li>
+            <li><strong style="color: var(--text-primary);">Micropayments</strong> — Pay per query via Circle x402, not subscriptions</li>
+            <li><strong style="color: var(--text-primary);">20+ Platforms</strong> — Gmail, GitHub, Spotify, Slack, Notion, and more</li>
+          </ul>
+        </div>
+        <div class="anim-fade-up anim-d3">
+          <div class="glow-border">
+            <div class="glow-border-inner" style="text-align: center;">
+              <div class="big-stat" style="font-size: 3rem;">$0.001</div>
+              <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">per query</div>
+              <div style="margin: 24px 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);"></div>
+              <div class="big-stat" style="font-size: 3rem;">&lt;100ms</div>
+              <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">recall latency</div>
+              <div style="margin: 24px 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);"></div>
+              <div class="big-stat" style="font-size: 3rem;">100%</div>
+              <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">on-chain consent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: LIVE DEMO -->
+    <div class="slide" data-index="3">
+      <div class="label anim-fade-up" style="color: var(--success);">⚡ Live Demo</div>
+      <h2 class="section-title anim-fade-up anim-d1">See it in action.</h2>
+      <p class="subtitle anim-fade-up anim-d2" style="margin-bottom: 32px;">A full user journey — from onboarding to memory query to consent revocation.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;">
+        <div class="glass anim-fade-up anim-d1" style="text-align: center; padding: 24px 16px;">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">1</div>
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">Onboard</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Connect 20+ platforms</div>
+        </div>
+        <div class="glass anim-fade-up anim-d2" style="text-align: center; padding: 24px 16px;">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">2</div>
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">Mint Consent</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">NFT on NEAR testnet</div>
+        </div>
+        <div class="glass anim-fade-up anim-d3" style="text-align: center; padding: 24px 16px;">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">3</div>
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">Query Memory</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Real vector search</div>
+        </div>
+        <div class="glass anim-fade-up anim-d4" style="text-align: center; padding: 24px 16px;">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">4</div>
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">Revoke</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Burn NFT instantly</div>
+        </div>
+      </div>
+
+      <div class="screenshot-frame anim-fade-up anim-d4">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+          <div class="glass" style="flex: 1; min-width: 200px; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">📧</div>
+            <div style="font-weight: 600; color: var(--text-primary);">Gmail</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Emails & threads</div>
+          </div>
+          <div class="glass" style="flex: 1; min-width: 200px; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">💾</div>
+            <div style="font-weight: 600; color: var(--text-primary);">GitHub</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Commits & PRs</div>
+          </div>
+          <div class="glass" style="flex: 1; min-width: 200px; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🎵</div>
+            <div style="font-weight: 600; color: var(--text-primary);">Spotify</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Listening history</div>
+          </div>
+        </div>
+        <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 0.85rem;">
+          <strong style="color: var(--accent);">Try it now:</strong> unified-memory.kawai-labs.com
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: TECH STACK -->
+    <div class="slide" data-index="4">
+      <div class="label anim-fade-up">Technology</div>
+      <h2 class="section-title anim-fade-up anim-d1">Built for scale.</h2>
+      <div class="arch-row anim-fade-up anim-d2">
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">🔗</div>
+          <div>NEAR</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Consent NFTs</div>
+        </div>
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">🧠</div>
+          <div>Pinecone</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Vector DB</div>
+        </div>
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">💳</div>
+          <div>Circle</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">x402 Payments</div>
+        </div>
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">☁️</div>
+          <div>Cloudflare</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Edge Workers</div>
+        </div>
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">⚡</div>
+          <div>Next.js</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Frontend</div>
+        </div>
+        <div class="arch-block">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">🤖</div>
+          <div>OpenRouter</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">LLM Routing</div>
+        </div>
+      </div>
+      <div class="anim-fade-up anim-d3" style="margin-top: 40px;">
+        <div class="glass" style="max-width: 700px; margin: 0 auto; text-align: center;">
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7;">
+            <strong style="color: var(--text-primary);">Architecture:</strong> Cloudflare Worker sits at the edge, validating consent via NEAR RPC before every query. Pinecone handles sub-100ms vector recall. Circle x402 gates access with micropayments. The result is a trustless, fast, and fair AI memory layer.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: BUSINESS MODEL -->
+    <div class="slide" data-index="5">
+      <div class="label anim-fade-up">Business Model</div>
+      <h2 class="section-title anim-fade-up anim-d1">Monetize memory.</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px;">
+        <div class="glow-border anim-fade-up anim-d2">
+          <div class="glow-border-inner" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 12px;">📱</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Freemium</h3>
+            <div class="big-stat" style="font-size: 2.5rem;">$0</div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px; line-height: 1.5;">3 free queries/day to try the platform</p>
+          </div>
+        </div>
+        <div class="glow-border anim-fade-up anim-d3" style="transform: scale(1.05);">
+          <div class="glow-border-inner" style="text-align: center; border: 1px solid rgba(168,85,247,0.3); border-radius: 16px;">
+            <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; font-size: 0.7rem; font-weight: 600; padding: 4px 16px; border-radius: 20px;">MOST POPULAR</div>
+            <div style="font-size: 2rem; margin-bottom: 12px; margin-top: 8px;">💎</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Pay-Per-Query</h3>
+            <div class="big-stat" style="font-size: 2.5rem;">$0.001</div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px; line-height: 1.5;">Per memory query via x402 micropayments</p>
+          </div>
+        </div>
+        <div class="glow-border anim-fade-up anim-d4">
+          <div class="glow-border-inner" style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 12px;">🏢</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Enterprise</h3>
+            <div class="big-stat" style="font-size: 2.5rem;">Custom</div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px; line-height: 1.5;">Flat rate for teams with SSO & audit logs</p>
+          </div>
+        </div>
+      </div>
+      <div class="anim-fade-up anim-d4" style="margin-top: 40px; text-align: center;">
+        <p style="color: var(--text-secondary); font-size: 1rem;">
+          <strong style="color: var(--text-primary);">TAM:</strong> $15B AI memory market by 2028
+          <span style="margin: 0 12px; color: var(--border);">|</span>
+          <strong style="color: var(--text-primary);">Revenue:</strong> $50K ARR projected Year 1
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: TRACTION -->
+    <div class="slide" data-index="6">
+      <div class="label anim-fade-up">Traction</div>
+      <h2 class="section-title anim-fade-up anim-d1">48 hours. Real data.<br>Real users.</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px;">
+        <div class="glass anim-fade-up anim-d1" style="text-align: center;">
+          <div class="big-stat">90+</div>
+          <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Vectors in Pinecone</div>
+        </div>
+        <div class="glass anim-fade-up anim-d2" style="text-align: center;">
+          <div class="big-stat">&lt;100ms</div>
+          <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Query Latency</div>
+        </div>
+        <div class="glass anim-fade-up anim-d3" style="text-align: center;">
+          <div class="big-stat">20+</div>
+          <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Platforms Connected</div>
+        </div>
+        <div class="glass anim-fade-up anim-d4" style="text-align: center;">
+          <div class="big-stat">100%</div>
+          <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">On-Chain Consent</div>
+        </div>
+      </div>
+      <div class="anim-fade-up anim-d4" style="margin-top: 40px;">
+        <div class="glass" style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center;">
+          <div style="text-align: center;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Smart Contract</div>
+            <div style="font-family: 'Space Grotesk', monospace; font-size: 0.85rem; color: var(--accent); margin-top: 4px;">aihackathon.testnet</div>
+          </div>
+          <div style="width: 1px; height: 40px; background: var(--border);"></div>
+          <div style="text-align: center;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Worker</div>
+            <div style="font-family: 'Space Grotesk', monospace; font-size: 0.85rem; color: var(--accent); margin-top: 4px;">Cloudflare Edge</div>
+          </div>
+          <div style="width: 1px; height: 40px; background: var(--border);"></div>
+          <div style="text-align: center;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Frontend</div>
+            <div style="font-family: 'Space Grotesk', monospace; font-size: 0.85rem; color: var(--accent); margin-top: 4px;">Next.js + HTTPS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: ASK -->
+    <div class="slide" data-index="7">
+      <div style="text-align: center; padding-top: 20px;">
+        <div class="label anim-fade-up" style="color: var(--success);">The Ask</div>
+        <h2 class="hero-title anim-fade-up anim-d1" style="font-size: clamp(2.5rem, 5vw, 4rem);">Help us build the<br>memory layer for AI.</h2>
+        <div class="anim-fade-up anim-d2" style="display: flex; gap: 24px; justify-content: center; margin: 40px 0; flex-wrap: wrap;">
+          <div class="glass" style="text-align: center; min-width: 180px;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Mentorship</div>
+            <div style="font-size: 1.3rem; font-weight: 600;">Blockchain + AI</div>
+          </div>
+          <div class="glass" style="text-align: center; min-width: 180px;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Network</div>
+            <div style="font-size: 1.3rem; font-weight: 600;">Enterprise Pilots</div>
+          </div>
+          <div class="glass" style="text-align: center; min-width: 180px;">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Cloud Credits</div>
+            <div style="font-size: 1.3rem; font-weight: 600;">Scale to 100K users</div>
+          </div>
+        </div>
+        <div class="anim-fade-up anim-d3" style="margin-top: 20px;">
+          <a href="https://unified-memory.kawai-labs.com" target="_blank" class="btn" style="font-size: 1.1rem; padding: 16px 40px;">
+            🚀 Try the Live Demo
+          </a>
+        </div>
+        <div class="anim-fade-up anim-d4" style="margin-top: 40px;">
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            <strong style="color: var(--accent);">GitHub:</strong> github.com/KAWALI-LABS/unified-memory<br>
+            <div class="anim-fade-up anim-d4" style="margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          <div style="background: white; padding: 12px; border-radius: 16px; box-shadow: 0 8px 32px rgba(168,85,247,0.25);">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQAAAABTUiuoAAACZElEQVR4nO2bQYrjMBBFX7UMWcrQB8hR5KvNkeYG9lFygAFpGbD5s5DU6cxi6G5IR9ClRYjjt/hQVOXnl2Pig2d7+SgJjjrq6AsUa2fhMDYzM5sPM7OJfmsaRKujBEmSgCDS7V0GkiQpD6PVUWjdw2H988Mg7tTOWx4uwNEvoEG2FDMpB0GZvl2Ao/899wU5Jm1n0Tos7t8gwNFPV6vZ+DJjRNC2gDYLO0QB5XECHP0ESrMQACkH/fvSTpDWp2t1FL0/OxD3XsF4d8+rNQRaJtjmw2wpJ5EuJ9lCkHQxY5sfL8DRj54J4tUEQWznq7XLcpgALOVjEuV1H0Cro9VlWLpMu8FJ7XIVRmzu0Ko7fLpWR1/6z6rDtHbLrrVMkDLo1/xmNUbQ+sNRurdQjZq0RtXyaAVI2tHqnnAMtHvC3AtV08F8f9c94TjoYdTQCWA7t1aTMthSPIMfB6VmgkmSVmhTr05HQv8sem8NgbbkaZszluoX1mGizIgym9Jtt/x0rY7SVltR0hr37i3yW4PVaMNdxhBon4SZ7i2q1QgiaaePSK/WKGjstqIWpbztJcvE+yXXCFp/ONrHHNQ+akOwvgBv23/vrQHQuww+3wZjaK1Wt8g+CcdA7/Zb2rn11m3J5Q5+FHQCQo0HjfIq2+bQY1xAlMOa/Xi6VkdbBl9LFq9G+v2KKAY95NipO/+na3X07ima3lv1aYztvE+0Z9XywwQ4+lU0Xk3Kh9lSzKCcmjFMF88Jh0Cbg5dUfw73iBB4Z97dZYyB9lkHQJmp45D4Z6o5Yf3KeqAARz+Bmv8jyFFHH4L+BWmAtsmX6PyJAAAAAElFTkSuQmCC" alt="QR Code" style="width: 160px; height: 160px; border-radius: 8px; display: block;">
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); font-family: monospace;">unified-memory.kawai-labs.com</div>
+        </div>
+          <strong style="color: var(--accent);">Team:</strong> Moe, Bayram, Selcuk, Ali
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+
+    function showSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= slides.length) index = slides.length - 1;
+      current = index;
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === current);
+        if (i === current) {
+          // restart animations
+          const anims = s.querySelectorAll('.anim-fade-up');
+          anims.forEach(el => {
+            el.style.animation = 'none';
+            el.offsetHeight; // trigger reflow
+            el.style.animation = '';
+          });
+        }
+      });
+      document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+      document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); showSlide(current + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); showSlide(current - 1); }
+      if (e.key === 'f') { document.documentElement.requestFullscreen?.(); }
+    });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) showSlide(current + (diff > 0 ? 1 : -1));
+    });
+
+    document.addEventListener('click', (e) => {
+      const x = e.clientX / window.innerWidth;
+      if (x > 0.85) showSlide(current + 1);
+      else if (x < 0.15) showSlide(current - 1);
+    });
+
+    showSlide(0);
+  </script>
+</body>
+</html>

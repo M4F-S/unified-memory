@@ -1,0 +1,23 @@
+name = "unified-memory-mcp"
+main = "mcp-server.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+routes = [
+  { pattern = "unified-memory-mcp.mohamedfathy7.workers.dev", custom_domain = true }
+]
+
+[vars]
+NEAR_CONTRACT_ID      = "aihackathon.testnet"
+NEAR_RPC              = "https://rpc.testnet.fastnear.com"
+PINECONE_INDEX_NAME   = "unified-memory"
+PINECONE_HOST         = "unified-memory-rsv5o69.svc.aped-4627-b74a.pinecone.io"
+EAS_SCHEMA_UID        = "0x0000000000000000000000000000000000000000000000000000000000000000"
+CIRCLE_WALLET_ADDRESS = "0x0000000000000000000000000000000000000001"
+INGEST_BACKEND_URL    = ""
+
+# Set secrets with: wrangler secret put SECRET_NAME
+# wrangler secret put OPENROUTER_API_KEY
+# wrangler secret put PINECONE_API_KEY
+# wrangler secret put CIRCLE_API_KEY   # optional for hackathon demo

@@ -1,0 +1,96 @@
+# UnifiedMemory Docker Compose Platform
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: um-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: unifiedmemory
+      POSTGRES_USER: um_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-um_password_change_me}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U um_user -d unifiedmemory"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - um-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: um-redis
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - um-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: um-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://um_user:${POSTGRES_PASSWORD:-um_password_change_me}@postgres:5432/unifiedmemory
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env:ro
+    networks:
+      - um-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: um-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_MCP_URL: ""
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend
+    networks:
+      - um-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local
+
+networks:
+  um-network:
+    driver: bridge
