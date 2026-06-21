@@ -40,5 +40,17 @@
     "email": "e2e_test_1782046267@example.com",
     "password_hash": "$2b$12$MZsxS6J2UiK.p8ThZSoO7ernaVbOa2Xn..SWCAMhrEj2E3wo1GKz.",
     "created_at": "2026-06-21T12:51:07.700547+00:00"
+  },
+  {
+    "id": "8320e2293dd347a4b956e50956368956",
+    "email": "final_1782046386@test.com",
+    "password_hash": "$2b$12$B9OX/QZMvLoGWdOfWSJ8v.qDWT41dy6YKDDU7oPYu3t/WTejnOAO.",
+    "created_at": "2026-06-21T12:53:06.532792+00:00"
+  },
+  {
+    "id": "c3d43e2a609b47c4ba6a11c53ec31a62",
+    "email": "test-cleanup@example.com",
+    "password_hash": "$2b$12$74C8qCy2MowrYKjxcNgsqei.AgPq5gAr9Ln8.QwGYPBB9RSvSKW5a",
+    "created_at": "2026-06-21T16:22:47.377702+00:00"
   }
 ]

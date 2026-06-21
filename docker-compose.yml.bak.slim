@@ -37,7 +37,9 @@ services:
       - um-network
 
   backend:
-    image: unified-memory-backend:slim
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: um-backend
     restart: unless-stopped
     env_file:
