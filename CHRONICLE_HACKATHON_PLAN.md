@@ -1,0 +1,1 @@
+file:///Users/mohamedfathy/Documents/Kimi/Workspaces/Mnemosyne/CHRONICLE_HACKATHON_PLAN.md
