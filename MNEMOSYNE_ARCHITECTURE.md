@@ -1,0 +1,1 @@
+file:///Users/mohamedfathy/Documents/Kimi/Workspaces/Mnemosyne/MNEMOSYNE_ARCHITECTURE.md
